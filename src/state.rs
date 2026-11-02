@@ -120,7 +120,10 @@ mod tests {
         let due = next_due_after(monday.timestamp() as u64, "Sun 12:00").unwrap();
         let due_local = Local.timestamp_opt(due as i64, 0).unwrap();
         assert_eq!(due_local.weekday(), Weekday::Sun);
-        assert_eq!(due_local.format("%Y-%m-%d %H:%M").to_string(), "2026-11-08 12:00");
+        assert_eq!(
+            due_local.format("%Y-%m-%d %H:%M").to_string(),
+            "2026-11-08 12:00"
+        );
     }
 
     #[test]
@@ -128,7 +131,10 @@ mod tests {
         let sunday_afternoon = Local.with_ymd_and_hms(2026, 11, 8, 13, 0, 0).unwrap();
         let due = next_due_after(sunday_afternoon.timestamp() as u64, "Sun 12:00").unwrap();
         let due_local = Local.timestamp_opt(due as i64, 0).unwrap();
-        assert_eq!(due_local.format("%Y-%m-%d %H:%M").to_string(), "2026-11-15 12:00");
+        assert_eq!(
+            due_local.format("%Y-%m-%d %H:%M").to_string(),
+            "2026-11-15 12:00"
+        );
     }
 
     #[test]

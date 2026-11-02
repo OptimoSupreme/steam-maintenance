@@ -46,15 +46,20 @@ impl Config {
             branch: env("BRANCH").unwrap_or_else(|| "main".into()),
             cache_workflow: env("CACHE_WORKFLOW").unwrap_or_else(|| "cache.yml".into()),
             check_due: env("CHECK_DUE").unwrap_or_else(|| "Sun 12:00".into()),
-            max_deferrals: env("MAX_DEFERRALS").and_then(|v| v.parse().ok()).unwrap_or(2),
-            battery_gate: env("BATTERY_GATE").and_then(|v| v.parse().ok()).unwrap_or(30),
+            max_deferrals: env("MAX_DEFERRALS")
+                .and_then(|v| v.parse().ok())
+                .unwrap_or(2),
+            battery_gate: env("BATTERY_GATE")
+                .and_then(|v| v.parse().ok())
+                .unwrap_or(30),
             protocol_handler: env("PROTOCOL_HANDLER")
                 .map(PathBuf::from)
                 .unwrap_or_else(|| PathBuf::from("steam")),
             unit: env("UNIT").unwrap_or_else(|| "steam-maintenance-upgrade.service".into()),
             grid_dir: env("GRID_DIR").map(PathBuf::from),
             toast: env("TOAST").map(|v| v != "0").unwrap_or(true),
-            exe: env("EXE").unwrap_or_else(|| "/run/current-system/sw/bin/steam-maintenance".into()),
+            exe: env("EXE")
+                .unwrap_or_else(|| "/run/current-system/sw/bin/steam-maintenance".into()),
             app_name: env("APP_NAME").unwrap_or_else(|| "System Update".into()),
         }
     }

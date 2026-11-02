@@ -1,0 +1,27 @@
+#### Checks ####
+
+name: check
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: DeterminateSystems/nix-installer-action@v23
+
+      - name: Flake check, failing on evaluation warnings
+        run: nix flake check --option abort-on-warn true
+
+      - name: nixfmt
+        run: nix shell nixpkgs#nixfmt -c nixfmt --check $(git ls-files '*.nix')
+
+      - name: rustfmt
+        run: nix develop -c cargo fmt --check
+
+      - name: clippy
+        run: nix develop -c cargo clippy --all-targets -- -D warnings

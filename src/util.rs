@@ -44,7 +44,9 @@ pub fn atomic_write(path: &Path, bytes: &[u8]) -> Result<()> {
     fs::create_dir_all(dir)?;
     let tmp = dir.join(format!(
         ".{}.tmp",
-        path.file_name().map(|n| n.to_string_lossy()).unwrap_or_default()
+        path.file_name()
+            .map(|n| n.to_string_lossy())
+            .unwrap_or_default()
     ));
     fs::write(&tmp, bytes).with_context(|| format!("writing {}", tmp.display()))?;
     fs::rename(&tmp, path).with_context(|| format!("renaming into {}", path.display()))?;

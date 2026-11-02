@@ -1,0 +1,556 @@
+@nix {"action":"msg","level":4,"msg":"evaluating file '«nix-internal»/derivation-internal.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/default.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/lib/minfeatures.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/top-level/impure.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/top-level/default.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/lib/default.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/lib/trivial.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/lib/lists.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/top-level/impure-overlays.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/lib/systems/default.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/lib/attrsets.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/lib/systems/architectures.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/lib/systems/inspect.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/lib/systems/parse.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/lib/strings.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/lib/types.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/lib/modules.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/top-level/config.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/lib/options.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/lib/debug.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/stdenv/generic/problems.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/stdenv/booter.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/stdenv/default.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/lib/systems/platforms.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/stdenv/linux/default.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/stdenv/linux/stage0.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/default.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/lib/customisation.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/bash/static.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/bash/default.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/bash/2.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/stage0-posix/default.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/stage0-posix/kaem/default.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/utils.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/top-level/stage.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/lib/fixed-points.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/top-level/variants.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/top-level/aliases.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/lib/asserts.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/top-level/all-packages.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/top-level/by-name-overlay.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/top-level/splice.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/build-support/trivial-builders/default.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/stdenv/adapters.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/stdenv/generic/default.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/build-support/bintools-wrapper/default.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/binutils/static.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/coreutils/static.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/gnugrep/static.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/stdenv/generic/make-derivation.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/stdenv/generic/check-meta.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/binutils/common.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/gcc/glibc.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/development/tools/misc/binutils/default.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/build-support/cc-wrapper/default.nix'"}
+@nix {"action":"start","id":1364257706868736,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/stdenv/generic/source-stdenv.sh' to the store","type":0}
+@nix {"action":"stop","id":1364257706868736}
+@nix {"action":"start","id":1364257706868737,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/stdenv/generic/default-builder.sh' to the store","type":0}
+@nix {"action":"stop","id":1364257706868737}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/glibc/default.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/lib/licenses/default.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/lib/licenses/helpers.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/lib/licenses/operators.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/lib/licenses/licenses.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/lib/systems/doubles.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/gcc/latest.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/binutils/default.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/gnumake/musl.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/gnused/default.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/gawk/default.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/diffutils/default.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/findutils/default.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/python/default.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/bison/default.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/gnutar/latest.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/xz/default.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/coreutils/musl.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/gcc/10.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/gnugrep/default.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/gzip/default.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/bzip2/default.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/gcc/4.6.cxx.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/gcc/4.6.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/gnupatch/default.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/gnutar/musl.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/tinycc/musl.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/coreutils/default.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/stage0-posix/mescc-tools-extra/default.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/bash/common.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/tinycc/mes.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/tinycc/common.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/gnumake/default.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/stage0-posix/mescc-tools/default.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/stage0-posix/platforms.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/stage0-posix/bootstrap-sources.nix'"}
+@nix {"action":"start","id":1364257706868738,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/stage0-posix/mescc-tools-extra/build.kaem' to the store","type":0}
+@nix {"action":"stop","id":1364257706868738}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/stage0-posix/mescc-tools-boot.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/stage0-posix/hex0.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '<nix/fetchurl.nix>'"}
+@nix {"action":"start","id":1364257706868739,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/stage0-posix/mescc-tools/build.kaem' to the store","type":0}
+@nix {"action":"stop","id":1364257706868739}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/tinycc/bootstrappable.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/mes/default.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/build-support/fetchurl/boot.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/build-support/fetchurl/mirrors.nix'"}
+@nix {"action":"start","id":1364257706868740,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/mes/setjmp_x86_64.c' to the store","type":0}
+@nix {"action":"stop","id":1364257706868740}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/mes/nyacc.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/mes/libc.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/ln-boot/default.nix'"}
+@nix {"action":"start","id":1364257706868741,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/ln-boot/ln.c' to the store","type":0}
+@nix {"action":"stop","id":1364257706868741}
+@nix {"action":"start","id":1364257706868742,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/mes/ldexpl.c' to the store","type":0}
+@nix {"action":"stop","id":1364257706868742}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/gnumake/common.nix'"}
+@nix {"action":"start","id":1364257706868743,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/gnumake/0001-No-impure-bin-sh.patch' to the store","type":0}
+@nix {"action":"stop","id":1364257706868743}
+@nix {"action":"start","id":1364257706868744,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/gnumake/0002-remove-impure-dirs.patch' to the store","type":0}
+@nix {"action":"stop","id":1364257706868744}
+@nix {"action":"start","id":1364257706868745,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/gnumake/0003-tinycc-support.patch' to the store","type":0}
+@nix {"action":"stop","id":1364257706868745}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/coreutils/common.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/gnutar/mes.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/gnutar/common.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/gnused/mes.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/gnused/common.nix'"}
+@nix {"action":"start","id":1364257706868746,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/gnugrep/main.mk' to the store","type":0}
+@nix {"action":"stop","id":1364257706868746}
+@nix {"action":"start","id":1364257706868747,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/tinycc/static-link.patch' to the store","type":0}
+@nix {"action":"stop","id":1364257706868747}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/musl/tcc.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/musl/common.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/gawk/mes.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/gawk/common.nix'"}
+@nix {"action":"start","id":1364257706868748,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/gawk/no-stamp.patch' to the store","type":0}
+@nix {"action":"stop","id":1364257706868748}
+@nix {"action":"start","id":1364257706868749,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/bash/mksignames-flush.patch' to the store","type":0}
+@nix {"action":"stop","id":1364257706868749}
+@nix {"action":"start","id":1364257706868750,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/binutils/deterministic.patch' to the store","type":0}
+@nix {"action":"stop","id":1364257706868750}
+@nix {"action":"start","id":1364257706868751,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/binutils/fix-tinycc-attribute.patch' to the store","type":0}
+@nix {"action":"stop","id":1364257706868751}
+@nix {"action":"start","id":1364257706868752,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/gcc/no-system-headers.patch' to the store","type":0}
+@nix {"action":"stop","id":1364257706868752}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/musl/default.nix'"}
+@nix {"action":"start","id":1364257706868753,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/python/no-ldconfig.patch' to the store","type":0}
+@nix {"action":"stop","id":1364257706868753}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/zlib/default.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/lib/versions.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/gnum4/default.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/linux-headers/default.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/build-support/lib/cmake.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/build-support/lib/meson.nix'"}
+@nix {"action":"start","id":1364257706868754,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/stdenv/generic/builder.sh' to the store","type":0}
+@nix {"action":"stop","id":1364257706868754}
+@nix {"action":"start","id":1364257706868755,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/build-support/setup-hooks/no-broken-symlinks.sh' to the store","type":0}
+@nix {"action":"stop","id":1364257706868755}
+@nix {"action":"start","id":1364257706868756,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/build-support/setup-hooks/audit-tmpdir.sh' to the store","type":0}
+@nix {"action":"stop","id":1364257706868756}
+@nix {"action":"start","id":1364257706868757,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/build-support/setup-hooks/compress-man-pages.sh' to the store","type":0}
+@nix {"action":"stop","id":1364257706868757}
+@nix {"action":"start","id":1364257706868758,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/build-support/setup-hooks/make-symlinks-relative.sh' to the store","type":0}
+@nix {"action":"stop","id":1364257706868758}
+@nix {"action":"start","id":1364257706868759,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/build-support/setup-hooks/move-docs.sh' to the store","type":0}
+@nix {"action":"stop","id":1364257706868759}
+@nix {"action":"start","id":1364257706868760,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/build-support/setup-hooks/move-lib64.sh' to the store","type":0}
+@nix {"action":"stop","id":1364257706868760}
+@nix {"action":"start","id":1364257706868761,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/build-support/setup-hooks/move-sbin.sh' to the store","type":0}
+@nix {"action":"stop","id":1364257706868761}
+@nix {"action":"start","id":1364257706868762,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/build-support/setup-hooks/move-systemd-user-units.sh' to the store","type":0}
+@nix {"action":"stop","id":1364257706868762}
+@nix {"action":"start","id":1364257706868763,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/build-support/setup-hooks/multiple-outputs.sh' to the store","type":0}
+@nix {"action":"stop","id":1364257706868763}
+@nix {"action":"start","id":1364257706868764,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/build-support/setup-hooks/patch-shebangs.sh' to the store","type":0}
+@nix {"action":"stop","id":1364257706868764}
+@nix {"action":"start","id":1364257706868765,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/build-support/setup-hooks/prune-libtool-files.sh' to the store","type":0}
+@nix {"action":"stop","id":1364257706868765}
+@nix {"action":"start","id":1364257706868766,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/build-support/setup-hooks/reproducible-builds.sh' to the store","type":0}
+@nix {"action":"stop","id":1364257706868766}
+@nix {"action":"start","id":1364257706868767,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/build-support/setup-hooks/set-source-date-epoch-to-latest.sh' to the store","type":0}
+@nix {"action":"stop","id":1364257706868767}
+@nix {"action":"start","id":1364257706868768,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/build-support/setup-hooks/strip.sh' to the store","type":0}
+@nix {"action":"stop","id":1364257706868768}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/bzip2/static.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/diffutils/static.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/findutils/static.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/gawk/static.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/gnumake/static.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/gnupatch/static.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/gnused/static.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/gnutar/static.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/gzip/static.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/patchelf/static.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/xz/static.nix'"}
+@nix {"action":"start","id":1364257706868769,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/stdenv/generic/setup.sh' to the store","type":0}
+@nix {"action":"stop","id":1364257706868769}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/development/tools/misc/patchelf/default.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/development/compilers/gcc/all.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/development/compilers/gcc/versions.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/lib/meta.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/development/compilers/gcc/default.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/development/compilers/gcc/common/libgcc.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/development/compilers/gcc/common/builder.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/development/compilers/gcc/common/checksum.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/development/compilers/gcc/common/meta.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/development/libraries/glibc/default.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/development/libraries/glibc/common.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/kernel-headers/default.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/development/libraries/gmp/6.x.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/development/libraries/isl/0.20.0.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/development/libraries/isl/generic.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/by-name/li/libmpc/package.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/by-name/mp/mpfr/package.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/development/libraries/zlib/default.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/development/libraries/gettext/default.nix'"}
+@nix {"action":"start","id":1364257706868770,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/development/libraries/zlib/export-variable.patch' to the store","type":0}
+@nix {"action":"stop","id":1364257706868770}
+@nix {"action":"start","id":1364257706868771,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/build-support/setup-hooks/update-autotools-gnu-config-scripts.sh' to the store","type":0}
+@nix {"action":"stop","id":1364257706868771}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/by-name/gn/gnu-config/package.nix'"}
+@nix {"action":"start","id":1364257706868772,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/build-support/bintools-wrapper/ld-wrapper.sh' to the store","type":0}
+@nix {"action":"stop","id":1364257706868772}
+@nix {"action":"start","id":1364257706868773,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/build-support/bintools-wrapper/add-flags.sh' to the store","type":0}
+@nix {"action":"stop","id":1364257706868773}
+@nix {"action":"start","id":1364257706868774,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/build-support/bintools-wrapper/add-hardening.sh' to the store","type":0}
+@nix {"action":"stop","id":1364257706868774}
+@nix {"action":"start","id":1364257706868775,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/build-support/wrapper-common/utils.bash' to the store","type":0}
+@nix {"action":"stop","id":1364257706868775}
+@nix {"action":"start","id":1364257706868776,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/build-support/wrapper-common/darwin-sdk-setup.bash' to the store","type":0}
+@nix {"action":"stop","id":1364257706868776}
+@nix {"action":"start","id":1364257706868777,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/build-support/setup-hooks/role.bash' to the store","type":0}
+@nix {"action":"stop","id":1364257706868777}
+@nix {"action":"start","id":1364257706868778,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/build-support/bintools-wrapper/setup-hook.sh' to the store","type":0}
+@nix {"action":"stop","id":1364257706868778}
+@nix {"action":"start","id":1364257706868779,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/build-support/cc-wrapper/add-flags.sh' to the store","type":0}
+@nix {"action":"stop","id":1364257706868779}
+@nix {"action":"start","id":1364257706868780,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/build-support/cc-wrapper/add-hardening.sh' to the store","type":0}
+@nix {"action":"stop","id":1364257706868780}
+@nix {"action":"start","id":1364257706868781,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/build-support/cc-wrapper/setup-hook.sh' to the store","type":0}
+@nix {"action":"stop","id":1364257706868781}
+@nix {"action":"start","id":1364257706868782,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/build-support/cc-wrapper/cc-wrapper.sh' to the store","type":0}
+@nix {"action":"stop","id":1364257706868782}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/shells/bash/5.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/shells/bash/bash-5.3-patches.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/by-name/bi/bison/package.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/lib/filesystem.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/by-name/gn/gnum4/package.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/development/interpreters/perl/default.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/development/interpreters/perl/interpreter.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/development/libraries/libxcrypt/default.nix'"}
+@nix {"action":"start","id":1364257706868783,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/development/interpreters/perl/no-sys-dirs.patch' to the store","type":0}
+@nix {"action":"stop","id":1364257706868783}
+@nix {"action":"start","id":1364257706868784,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/development/interpreters/perl/CVE-2026-15534-1.patch' to the store","type":0}
+@nix {"action":"stop","id":1364257706868784}
+@nix {"action":"start","id":1364257706868785,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/development/interpreters/perl/CVE-2026-15534-2.patch' to the store","type":0}
+@nix {"action":"stop","id":1364257706868785}
+@nix {"action":"start","id":1364257706868786,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/development/interpreters/perl/setup-hook.sh' to the store","type":0}
+@nix {"action":"stop","id":1364257706868786}
+@nix {"action":"start","id":1364257706868787,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/build-support/setup-hooks/separate-debug-info.sh' to the store","type":0}
+@nix {"action":"stop","id":1364257706868787}
+@nix {"action":"start","id":1364257706868788,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/shells/bash/pgrp-pipe-5.patch' to the store","type":0}
+@nix {"action":"stop","id":1364257706868788}
+@nix {"action":"start","id":1364257706868789,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/development/libraries/gettext/absolute-paths.diff' to the store","type":0}
+@nix {"action":"stop","id":1364257706868789}
+@nix {"action":"start","id":1364257706868790,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/development/libraries/gettext/0001-msginit-Do-not-use-POT-Creation-Date.patch' to the store","type":0}
+@nix {"action":"stop","id":1364257706868790}
+@nix {"action":"start","id":1364257706868791,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/development/libraries/gettext/gettext-setup-hook.sh' to the store","type":0}
+@nix {"action":"stop","id":1364257706868791}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/by-name/ex/expand-response-params/package.nix'"}
+@nix {"action":"start","id":1364257706868792,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/by-name/ex/expand-response-params/expand-response-params.c' to the store","type":0}
+@nix {"action":"stop","id":1364257706868792}
+@nix {"action":"start","id":1364257706868793,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/development/tools/misc/binutils/deterministic.patch' to the store","type":0}
+@nix {"action":"stop","id":1364257706868793}
+@nix {"action":"start","id":1364257706868794,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/development/tools/misc/binutils/0001-Revert-libtool.m4-fix-the-NM-nm-over-here-B-option-w.patch' to the store","type":0}
+@nix {"action":"stop","id":1364257706868794}
+@nix {"action":"start","id":1364257706868795,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/development/tools/misc/binutils/0001-Revert-libtool.m4-fix-nm-BSD-flag-detection.patch' to the store","type":0}
+@nix {"action":"stop","id":1364257706868795}
+@nix {"action":"start","id":1364257706868796,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/development/tools/misc/binutils/always-search-rpath.patch' to the store","type":0}
+@nix {"action":"stop","id":1364257706868796}
+@nix {"action":"start","id":1364257706868797,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/development/tools/misc/binutils/plugins-no-BINDIR.patch' to the store","type":0}
+@nix {"action":"stop","id":1364257706868797}
+@nix {"action":"start","id":1364257706868798,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/development/tools/misc/binutils/0001-libtool.m4-update-macos-version-detection-block.patch' to the store","type":0}
+@nix {"action":"stop","id":1364257706868798}
+@nix {"action":"start","id":1364257706868799,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/development/tools/misc/binutils/avr-size.patch' to the store","type":0}
+@nix {"action":"stop","id":1364257706868799}
+@nix {"action":"start","id":1364257706868800,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/development/tools/misc/binutils/windres-locate-gcc.patch' to the store","type":0}
+@nix {"action":"stop","id":1364257706868800}
+@nix {"action":"start","id":1364257706868801,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/build-support/bintools-wrapper/gnu-binutils-strip-wrapper.sh' to the store","type":0}
+@nix {"action":"stop","id":1364257706868801}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/development/compilers/gcc/common/extra-target-flags.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/development/compilers/gcc/common/dependencies.nix'"}
+@nix {"action":"start","id":1364257706868802,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/development/libraries/libxcrypt/fix-symver-on-non-elf.patch' to the store","type":0}
+@nix {"action":"stop","id":1364257706868802}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/development/compilers/gcc/common/configure-flags.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/development/compilers/gcc/common/platform-flags.nix'"}
+@nix {"action":"start","id":1364257706868803,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/development/tools/misc/patchelf/setup-hook.sh' to the store","type":0}
+@nix {"action":"stop","id":1364257706868803}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/development/tools/misc/texinfo/packages.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/development/tools/misc/texinfo/common.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/by-name/wh/which/package.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/development/tools/misc/autoconf/2.69.nix'"}
+@nix {"action":"start","id":1364257706868804,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/by-name/wh/which/gcc15.patch' to the store","type":0}
+@nix {"action":"stop","id":1364257706868804}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/development/compilers/gcc/patches/default.nix'"}
+@nix {"action":"start","id":1364257706868805,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/development/compilers/gcc/patches/gcc-12-no-sys-dirs.patch' to the store","type":0}
+@nix {"action":"stop","id":1364257706868805}
+@nix {"action":"start","id":1364257706868806,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/development/compilers/gcc/patches/13/no-sys-dirs-riscv.patch' to the store","type":0}
+@nix {"action":"stop","id":1364257706868806}
+@nix {"action":"start","id":1364257706868807,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/development/compilers/gcc/patches/13/mangle-NIX_STORE-in-__FILE__.patch' to the store","type":0}
+@nix {"action":"stop","id":1364257706868807}
+@nix {"action":"start","id":1364257706868808,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/development/compilers/gcc/patches/ppc-musl.patch' to the store","type":0}
+@nix {"action":"stop","id":1364257706868808}
+@nix {"action":"start","id":1364257706868809,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/development/compilers/gcc/patches/cfi_startproc-reorder-label-14-1.diff' to the store","type":0}
+@nix {"action":"stop","id":1364257706868809}
+@nix {"action":"start","id":1364257706868810,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/development/compilers/gcc/patches/c++tools-dont-check-enable-default-pie.patch' to the store","type":0}
+@nix {"action":"stop","id":1364257706868810}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/build-support/nuke-references/default.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/build-support/replace-vars/replace-vars-with.nix'"}
+@nix {"action":"start","id":1364257706868811,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/build-support/nuke-references/nuke-refs' to the store","type":0}
+@nix {"action":"stop","id":1364257706868811}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/development/compilers/gcc/common/pre-configure.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/development/compilers/gcc/common/strip-attributes.nix'"}
+@nix {"action":"start","id":1364257706868812,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/kernel-headers/no-relocs.patch' to the store","type":0}
+@nix {"action":"stop","id":1364257706868812}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/development/interpreters/python/default.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/development/interpreters/python/cpython/default.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/development/interpreters/python/passthrufun.nix'"}
+@nix {"action":"start","id":1364257706868813,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/development/interpreters/python/cpython/3.13/no-ldconfig.patch' to the store","type":0}
+@nix {"action":"stop","id":1364257706868813}
+@nix {"action":"start","id":1364257706868814,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/development/interpreters/python/cpython/3.13/virtualenv-permissions.patch' to the store","type":0}
+@nix {"action":"stop","id":1364257706868814}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/development/interpreters/python/setup-hook.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/build-support/replace-vars/replace-vars.nix'"}
+@nix {"action":"start","id":1364257706868815,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/development/interpreters/python/setup-hook.sh' to the store","type":0}
+@nix {"action":"stop","id":1364257706868815}
+@nix {"action":"start","id":1364257706868816,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/development/libraries/glibc/2.42-master.patch' to the store","type":0}
+@nix {"action":"stop","id":1364257706868816}
+@nix {"action":"start","id":1364257706868817,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/development/libraries/glibc/nix-locale-archive.patch' to the store","type":0}
+@nix {"action":"stop","id":1364257706868817}
+@nix {"action":"start","id":1364257706868818,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/development/libraries/glibc/dont-use-system-ld-so-cache.patch' to the store","type":0}
+@nix {"action":"stop","id":1364257706868818}
+@nix {"action":"start","id":1364257706868819,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/development/libraries/glibc/dont-use-system-ld-so-preload.patch' to the store","type":0}
+@nix {"action":"stop","id":1364257706868819}
+@nix {"action":"start","id":1364257706868820,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/development/libraries/glibc/fix_path_attribute_in_getconf.patch' to the store","type":0}
+@nix {"action":"stop","id":1364257706868820}
+@nix {"action":"start","id":1364257706868821,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/development/libraries/glibc/fix-x64-abi.patch' to the store","type":0}
+@nix {"action":"stop","id":1364257706868821}
+@nix {"action":"start","id":1364257706868822,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/development/libraries/glibc/nix-nss-open-files.patch' to the store","type":0}
+@nix {"action":"stop","id":1364257706868822}
+@nix {"action":"start","id":1364257706868823,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/development/libraries/glibc/0001-Revert-Remove-all-usage-of-BASH-or-BASH-in-installed.patch' to the store","type":0}
+@nix {"action":"stop","id":1364257706868823}
+@nix {"action":"start","id":1364257706868824,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/development/libraries/glibc/reenable_DT_HASH.patch' to the store","type":0}
+@nix {"action":"stop","id":1364257706868824}
+@nix {"action":"start","id":1364257706868825,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/development/libraries/glibc/0001-localedata-allow-reproducible-parallel-install-of-lo.patch' to the store","type":0}
+@nix {"action":"stop","id":1364257706868825}
+@nix {"action":"start","id":1364257706868826,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/development/libraries/glibc/0002-Makeconfig-make-inst_complocaledir-overridable.patch' to the store","type":0}
+@nix {"action":"stop","id":1364257706868826}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/development/libraries/libidn2/default.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/development/libraries/libunistring/default.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/tools/misc/coreutils/default.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/development/libraries/acl/default.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/development/libraries/attr/default.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/tools/text/gnugrep/default.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/tools/compression/xz/default.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/tools/compression/gzip/default.nix'"}
+@nix {"action":"start","id":1364257706868827,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/build-support/setup-hooks/make-wrapper.sh' to the store","type":0}
+@nix {"action":"stop","id":1364257706868827}
+@nix {"action":"start","id":1364257706868828,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/build-support/setup-hooks/die.sh' to the store","type":0}
+@nix {"action":"stop","id":1364257706868828}
+@nix {"action":"start","id":1364257706868829,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/tools/compression/gzip/CVE-2026-41991.patch' to the store","type":0}
+@nix {"action":"stop","id":1364257706868829}
+@nix {"action":"start","id":1364257706868830,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/tools/compression/gzip/CVE-2026-41992.patch' to the store","type":0}
+@nix {"action":"stop","id":1364257706868830}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/tools/compression/bzip2/default.nix'"}
+@nix {"action":"start","id":1364257706868831,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/build-support/setup-hooks/autoreconf.sh' to the store","type":0}
+@nix {"action":"stop","id":1364257706868831}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/development/tools/misc/autoconf/default.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/development/tools/misc/automake/automake-1.18.x.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/development/tools/misc/libtool/libtool2.nix'"}
+@nix {"action":"start","id":1364257706868832,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/development/tools/misc/automake/setup-hook.sh' to the store","type":0}
+@nix {"action":"stop","id":1364257706868832}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/tools/misc/file/default.nix'"}
+@nix {"action":"start","id":1364257706868833,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/tools/misc/file/0001-PR-745-streamout-Don-t-flush-when-trying-to-set-nega.patch' to the store","type":0}
+@nix {"action":"stop","id":1364257706868833}
+@nix {"action":"start","id":1364257706868834,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/tools/misc/file/0002-PR-725-inliniac-Revert-previous-and-always-set-offse.patch' to the store","type":0}
+@nix {"action":"stop","id":1364257706868834}
+@nix {"action":"start","id":1364257706868835,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/tools/compression/bzip2/patches/CVE-2026-42250.patch' to the store","type":0}
+@nix {"action":"stop","id":1364257706868835}
+@nix {"action":"start","id":1364257706868836,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/tools/compression/bzip2/patches/bzip2-1.0.6.2-autoconfiscated.patch' to the store","type":0}
+@nix {"action":"stop","id":1364257706868836}
+@nix {"action":"start","id":1364257706868837,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/tools/misc/coreutils/CVE-2026-56391.patch' to the store","type":0}
+@nix {"action":"stop","id":1364257706868837}
+@nix {"action":"start","id":1364257706868838,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/tools/misc/coreutils/CVE-2026-56392.patch' to the store","type":0}
+@nix {"action":"stop","id":1364257706868838}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/tools/text/diffutils/default.nix'"}
+@nix {"action":"start","id":1364257706868839,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/tools/text/diffutils/gnulib-float-h-tests-port-to-C23-PowerPC-GCC.patch' to the store","type":0}
+@nix {"action":"stop","id":1364257706868839}
+@nix {"action":"start","id":1364257706868840,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/tools/text/diffutils/musl-llvm.patch' to the store","type":0}
+@nix {"action":"stop","id":1364257706868840}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/tools/misc/findutils/default.nix'"}
+@nix {"action":"start","id":1364257706868841,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/tools/misc/findutils/no-install-statedir.patch' to the store","type":0}
+@nix {"action":"stop","id":1364257706868841}
+@nix {"action":"start","id":1364257706868842,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/tools/misc/findutils/gnulib-float-h-tests-port-to-C23-PowerPC-GCC.patch' to the store","type":0}
+@nix {"action":"stop","id":1364257706868842}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/tools/text/gawk/default.nix'"}
+@nix {"action":"start","id":1364257706868843,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/tools/text/gawk/node-struct-without-gmp-mpfr.patch' to the store","type":0}
+@nix {"action":"stop","id":1364257706868843}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/by-name/gn/gnumake/package.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/build-support/pkg-config-wrapper/default.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/by-name/pk/pkg-config-unwrapped/package.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/by-name/ve/versionCheckHook/package.nix'"}
+@nix {"action":"start","id":1364257706868844,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/build-support/pkg-config-wrapper/pkg-config-wrapper.sh' to the store","type":0}
+@nix {"action":"stop","id":1364257706868844}
+@nix {"action":"start","id":1364257706868845,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/by-name/pk/pkg-config-unwrapped/gcc-15.patch' to the store","type":0}
+@nix {"action":"stop","id":1364257706868845}
+@nix {"action":"start","id":1364257706868846,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/by-name/pk/pkg-config-unwrapped/requires-private.patch' to the store","type":0}
+@nix {"action":"stop","id":1364257706868846}
+@nix {"action":"start","id":1364257706868847,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/build-support/pkg-config-wrapper/add-flags.sh' to the store","type":0}
+@nix {"action":"stop","id":1364257706868847}
+@nix {"action":"start","id":1364257706868848,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/build-support/pkg-config-wrapper/setup-hook.sh' to the store","type":0}
+@nix {"action":"stop","id":1364257706868848}
+@nix {"action":"start","id":1364257706868849,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/by-name/ve/versionCheckHook/hook.sh' to the store","type":0}
+@nix {"action":"stop","id":1364257706868849}
+@nix {"action":"start","id":1364257706868850,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/by-name/gn/gnumake/patches/0001-No-impure-bin-sh.patch' to the store","type":0}
+@nix {"action":"stop","id":1364257706868850}
+@nix {"action":"start","id":1364257706868851,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/by-name/gn/gnumake/patches/0002-Remove-impure-dirs.patch' to the store","type":0}
+@nix {"action":"stop","id":1364257706868851}
+@nix {"action":"start","id":1364257706868852,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/by-name/gn/gnumake/patches/0003-Do-not-search-for-a-C-compiler-and-set-MAKE_CXX.patch' to the store","type":0}
+@nix {"action":"stop","id":1364257706868852}
+@nix {"action":"start","id":1364257706868853,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/by-name/gn/gnumake/patches/0004-Fix-signatures-for-getenv-getopt.patch' to the store","type":0}
+@nix {"action":"stop","id":1364257706868853}
+@nix {"action":"start","id":1364257706868854,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/by-name/gn/gnumake/patches/0005-Fix-signatures-for-getenv-getopt.patch' to the store","type":0}
+@nix {"action":"stop","id":1364257706868854}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/tools/text/gnused/default.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/by-name/gn/gnutar/package.nix'"}
+@nix {"action":"start","id":1364257706868855,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/by-name/gn/gnutar/link-libiconv.patch' to the store","type":0}
+@nix {"action":"stop","id":1364257706868855}
+@nix {"action":"start","id":1364257706868856,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/by-name/gn/gnutar/acl-2.4.0-name-conflicts.patch' to the store","type":0}
+@nix {"action":"stop","id":1364257706868856}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/by-name/pc/pcre2/package.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/development/libraries/glibc/locales.nix'"}
+@nix {"action":"start","id":1364257706868857,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/tools/text/gnugrep/gnulib-float-h-tests-port-to-C23-PowerPC-GCC.patch' to the store","type":0}
+@nix {"action":"stop","id":1364257706868857}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/tools/text/gnupatch/default.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/by-name/ed/ed/package.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/by-name/lz/lzip/package.nix'"}
+@nix {"action":"start","id":1364257706868858,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/by-name/lz/lzip/lzip-setup-hook.sh' to the store","type":0}
+@nix {"action":"stop","id":1364257706868858}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/heirloom/default.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/heirloom-devtools/default.nix'"}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/musl/static.nix'"}
+@nix {"action":"start","id":1364257706868859,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/heirloom/proctab.patch' to the store","type":0}
+@nix {"action":"stop","id":1364257706868859}
+@nix {"action":"start","id":1364257706868860,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/heirloom/disable-programs.patch' to the store","type":0}
+@nix {"action":"stop","id":1364257706868860}
+@nix {"action":"start","id":1364257706868861,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/heirloom/tcc-empty-ar.patch' to the store","type":0}
+@nix {"action":"stop","id":1364257706868861}
+@nix {"action":"start","id":1364257706868862,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/heirloom/dont-link-lm.patch' to the store","type":0}
+@nix {"action":"stop","id":1364257706868862}
+@nix {"action":"start","id":1364257706868863,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/heirloom/vprintf.patch' to the store","type":0}
+@nix {"action":"stop","id":1364257706868863}
+@nix {"action":"start","id":1364257706868864,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/heirloom/sysconf.patch' to the store","type":0}
+@nix {"action":"stop","id":1364257706868864}
+@nix {"action":"start","id":1364257706868865,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/heirloom/strcoll.patch' to the store","type":0}
+@nix {"action":"stop","id":1364257706868865}
+@nix {"action":"start","id":1364257706868866,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/heirloom/termios.patch' to the store","type":0}
+@nix {"action":"stop","id":1364257706868866}
+@nix {"action":"start","id":1364257706868867,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/heirloom/utime.patch' to the store","type":0}
+@nix {"action":"stop","id":1364257706868867}
+@nix {"action":"start","id":1364257706868868,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/heirloom/langinfo.patch' to the store","type":0}
+@nix {"action":"stop","id":1364257706868868}
+@nix {"action":"start","id":1364257706868869,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/heirloom/meslibc-support.patch' to the store","type":0}
+@nix {"action":"stop","id":1364257706868869}
+@nix {"action":"start","id":1364257706868870,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/heirloom/cp-no-socket.patch' to the store","type":0}
+@nix {"action":"stop","id":1364257706868870}
+@nix {"action":"start","id":1364257706868871,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/heirloom/proctab.c' to the store","type":0}
+@nix {"action":"stop","id":1364257706868871}
+@nix {"action":"start","id":1364257706868872,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/heirloom/stubs.h' to the store","type":0}
+@nix {"action":"stop","id":1364257706868872}
+@nix {"action":"start","id":1364257706868873,"level":5,"parent":0,"text":"copying '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/os-specific/linux/minimal-bootstrap/heirloom/musl.h' to the store","type":0}
+@nix {"action":"stop","id":1364257706868873}
+@nix {"action":"msg","level":4,"msg":"evaluating file '/nix/store/640irzgl08asrnjly4dspdbx8lz3cvqr-source/pkgs/stdenv/generic/common-path.nix'"}
+@nix {"action":"start","id":1364377965953024,"level":6,"parent":0,"text":"querying info about missing paths","type":0}
+@nix {"action":"start","fields":["/nix/store/c0hyxlsy44bvfaw1nklznbiqpdcl2mh3-sm-fixture-fail","https://cache.nixos.org"],"id":1364377965953025,"level":4,"parent":0,"text":"querying info about '/nix/store/c0hyxlsy44bvfaw1nklznbiqpdcl2mh3-sm-fixture-fail' on 'https://cache.nixos.org'","type":109}
+@nix {"action":"start","fields":["https://cache.nixos.org/c0hyxlsy44bvfaw1nklznbiqpdcl2mh3.narinfo"],"id":1364377965953026,"level":4,"parent":1364377965953025,"text":"downloading 'https://cache.nixos.org/c0hyxlsy44bvfaw1nklznbiqpdcl2mh3.narinfo'","type":101}
+@nix {"action":"result","fields":[0,0,0,0],"id":1364377965953026,"type":105}
+@nix {"action":"result","fields":[0,0,0,0],"id":1364377965953026,"type":105}
+@nix {"action":"result","fields":[0,0,0,0],"id":1364377965953026,"type":105}
+@nix {"action":"result","fields":[0,0,0,0],"id":1364377965953026,"type":105}
+@nix {"action":"result","fields":[0,0,0,0],"id":1364377965953026,"type":105}
+@nix {"action":"result","fields":[0,0,0,0],"id":1364377965953026,"type":105}
+@nix {"action":"result","fields":[0,0,0,0],"id":1364377965953026,"type":105}
+@nix {"action":"result","fields":[0,0,0,0],"id":1364377965953026,"type":105}
+@nix {"action":"result","fields":[3,3,0,0],"id":1364377965953026,"type":105}
+@nix {"action":"result","fields":[3,3,0,0],"id":1364377965953026,"type":105}
+@nix {"action":"result","fields":[3,3,0,0],"id":1364377965953026,"type":105}
+@nix {"action":"stop","id":1364377965953025}
+@nix {"action":"stop","id":1364377965953026}
+@nix {"action":"stop","id":1364377965953024}
+@nix {"action":"msg","level":3,"msg":"this derivation will be built:"}
+@nix {"action":"msg","level":3,"msg":"  /nix/store/ndwgi0fpjidzc50gj47ah1j4g695q2y2-sm-fixture-fail.drv"}
+@nix {"action":"start","id":1364377965953027,"level":0,"parent":0,"text":"","type":102}
+@nix {"action":"start","id":1364377965953028,"level":0,"parent":0,"text":"","type":104}
+@nix {"action":"start","id":1364377965953029,"level":0,"parent":0,"text":"","type":103}
+@nix {"action":"result","fields":[0,0,0,0],"id":1364377965953028,"type":105}
+@nix {"action":"result","fields":[0,0,0,0],"id":1364377965953029,"type":105}
+@nix {"action":"result","fields":[101,0],"id":1364377965953027,"type":106}
+@nix {"action":"result","fields":[100,0],"id":1364377965953027,"type":106}
+@nix {"action":"start","id":1364377965953030,"level":6,"parent":0,"text":"querying info about missing paths","type":0}
+@nix {"action":"stop","id":1364377965953030}
+@nix {"action":"result","fields":[0,1,0,0],"id":1364377965953028,"type":105}
+@nix {"action":"result","fields":[0,0,0,0],"id":1364377965953029,"type":105}
+@nix {"action":"result","fields":[101,0],"id":1364377965953027,"type":106}
+@nix {"action":"result","fields":[100,0],"id":1364377965953027,"type":106}
+@nix {"action":"result","fields":[0,1,0,0],"id":1364377965953028,"type":105}
+@nix {"action":"result","fields":[0,0,0,0],"id":1364377965953029,"type":105}
+@nix {"action":"result","fields":[101,0],"id":1364377965953027,"type":106}
+@nix {"action":"result","fields":[100,0],"id":1364377965953027,"type":106}
+@nix {"action":"result","fields":[0,1,0,0],"id":1364377965953028,"type":105}
+@nix {"action":"result","fields":[0,0,0,0],"id":1364377965953029,"type":105}
+@nix {"action":"result","fields":[101,0],"id":1364377965953027,"type":106}
+@nix {"action":"result","fields":[100,0],"id":1364377965953027,"type":106}
+@nix {"action":"result","fields":[0,2,0,0],"id":1364377965953028,"type":105}
+@nix {"action":"result","fields":[0,0,0,0],"id":1364377965953029,"type":105}
+@nix {"action":"result","fields":[101,0],"id":1364377965953027,"type":106}
+@nix {"action":"result","fields":[100,0],"id":1364377965953027,"type":106}
+@nix {"action":"result","fields":[0,3,0,0],"id":1364377965953028,"type":105}
+@nix {"action":"result","fields":[0,0,0,0],"id":1364377965953029,"type":105}
+@nix {"action":"result","fields":[101,0],"id":1364377965953027,"type":106}
+@nix {"action":"result","fields":[100,0],"id":1364377965953027,"type":106}
+@nix {"action":"result","fields":[0,2,0,0],"id":1364377965953028,"type":105}
+@nix {"action":"result","fields":[0,0,0,0],"id":1364377965953029,"type":105}
+@nix {"action":"result","fields":[101,0],"id":1364377965953027,"type":106}
+@nix {"action":"result","fields":[100,0],"id":1364377965953027,"type":106}
+@nix {"action":"result","fields":[0,1,0,0],"id":1364377965953028,"type":105}
+@nix {"action":"result","fields":[0,0,0,0],"id":1364377965953029,"type":105}
+@nix {"action":"result","fields":[101,0],"id":1364377965953027,"type":106}
+@nix {"action":"result","fields":[100,0],"id":1364377965953027,"type":106}
+@nix {"action":"start","fields":["/nix/store/ndwgi0fpjidzc50gj47ah1j4g695q2y2-sm-fixture-fail.drv","",1,1],"id":1364377965953031,"level":3,"parent":0,"text":"building '/nix/store/ndwgi0fpjidzc50gj47ah1j4g695q2y2-sm-fixture-fail.drv'","type":105}
+@nix {"action":"result","fields":[0,1,1,0],"id":1364377965953028,"type":105}
+@nix {"action":"result","fields":[0,0,0,0],"id":1364377965953029,"type":105}
+@nix {"action":"result","fields":[101,0],"id":1364377965953027,"type":106}
+@nix {"action":"result","fields":[100,0],"id":1364377965953027,"type":106}
+@nix {"action":"result","fields":["starting"],"id":1364377965953031,"type":101}
+@nix {"action":"result","fields":["step two"],"id":1364377965953031,"type":101}
+@nix {"action":"result","fields":["something went wrong"],"id":1364377965953031,"type":101}
+@nix {"action":"result","fields":[0,1,0,1],"id":1364377965953028,"type":105}
+@nix {"action":"result","fields":[0,0,0,0],"id":1364377965953029,"type":105}
+@nix {"action":"result","fields":[101,0],"id":1364377965953027,"type":106}
+@nix {"action":"result","fields":[100,0],"id":1364377965953027,"type":106}
+@nix {"action":"stop","id":1364377965953031}
+@nix {"action":"stop","id":1364377965953029}
+@nix {"action":"stop","id":1364377965953028}
+@nix {"action":"stop","id":1364377965953027}
+@nix {"action":"msg","column":null,"file":null,"level":0,"line":null,"msg":"\u001b[31;1merror:\u001b[0m Cannot build '\u001b[35;1m/nix/store/ndwgi0fpjidzc50gj47ah1j4g695q2y2-sm-fixture-fail.drv\u001b[0m'.\n       Reason: \u001b[31;1mbuilder failed with exit code 1\u001b[0m.\n       Output paths:\n         \u001b[35;1m/nix/store/c0hyxlsy44bvfaw1nklznbiqpdcl2mh3-sm-fixture-fail\u001b[0m\n       Last 3 log lines:\n       > starting\n       > step two\n       > something went wrong\n       For full logs, run:\n         \u001b[1mnix log /nix/store/ndwgi0fpjidzc50gj47ah1j4g695q2y2-sm-fixture-fail.drv\u001b[0m","raw_msg":"Cannot build '\u001b[35;1m/nix/store/ndwgi0fpjidzc50gj47ah1j4g695q2y2-sm-fixture-fail.drv\u001b[0m'.\nReason: \u001b[31;1mbuilder failed with exit code 1\u001b[0m.\nOutput paths:\n  \u001b[35;1m/nix/store/c0hyxlsy44bvfaw1nklznbiqpdcl2mh3-sm-fixture-fail\u001b[0m\nLast 3 log lines:\n> starting\n> step two\n> something went wrong\nFor full logs, run:\n  \u001b[1mnix log /nix/store/ndwgi0fpjidzc50gj47ah1j4g695q2y2-sm-fixture-fail.drv\u001b[0m"}
