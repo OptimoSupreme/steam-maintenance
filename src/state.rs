@@ -1,5 +1,5 @@
-//! Per-user scheduling state: when the next weekly check is due, how often it was
-//! deferred, and the shortcut's app id. Lives in `$XDG_STATE_HOME/steam-maintenance/`.
+//! Per-user scheduling state: when the next weekly check is due and how often it
+//! was deferred. Lives in `$XDG_STATE_HOME/steam-maintenance/`.
 
 use crate::util::{atomic_write, home_dir, now};
 use anyhow::{anyhow, Context, Result};
@@ -10,7 +10,6 @@ use std::path::PathBuf;
 
 const DIR: &str = "steam-maintenance";
 const STATE_FILE: &str = "state.json";
-const LAUNCH_REASON_FILE: &str = "launch-reason";
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(default)]
@@ -19,9 +18,7 @@ pub struct State {
     pub next_due: u64,
     /// Consecutive "Later" presses on scheduled prompts; reset by any upgrade.
     pub deferrals: u32,
-    /// App id of the Steam shortcut written by `register`.
-    pub shortcut_appid: Option<u32>,
-    /// Unix time the UI was last launched by the check.
+    /// Unix time the check last handed a prompt to the plugin.
     pub last_prompt: u64,
     /// Unix time before which the check stays quiet regardless of `next_due`.
     pub snooze_until: u64,
@@ -58,27 +55,21 @@ impl State {
     }
 }
 
-/// Written by `check` right before it launches the UI, so the UI can tell a
-/// scheduled prompt from a manual launch of the same Steam shortcut.
-pub fn write_launch_reason(reason: &str) -> Result<()> {
-    let dir = state_dir().ok_or_else(|| anyhow!("no home or XDG_STATE_HOME"))?;
-    atomic_write(&dir.join(LAUNCH_REASON_FILE), reason.as_bytes())
+/// Whether a scheduled prompt still offers Later, and whether pressing it warns.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
+pub struct LaterPolicy {
+    pub show: bool,
+    pub warn: bool,
 }
 
-/// Read and delete the launch reason. A reason older than five minutes is stale
-/// (the launch never happened) and is treated as absent.
-pub fn take_launch_reason() -> Option<String> {
-    let path = state_dir()?.join(LAUNCH_REASON_FILE);
-    let meta = fs::metadata(&path).ok()?;
-    let content = fs::read_to_string(&path).ok();
-    let _ = fs::remove_file(&path);
-    let fresh = meta
-        .modified()
-        .ok()
-        .and_then(|m| m.elapsed().ok())
-        .map(|age| age.as_secs() < 300)
-        .unwrap_or(false);
-    content.filter(|_| fresh).map(|s| s.trim().to_string())
+/// Later is hidden once the limit is reached, and the press that reaches the
+/// limit warns that the next round installs on its own.
+pub fn later_policy(deferrals: u32, max: u32) -> LaterPolicy {
+    let show = deferrals < max;
+    LaterPolicy {
+        show,
+        warn: show && deferrals + 1 >= max,
+    }
 }
 
 /// Parse `Day HH:MM` (local time) and return the first such instant strictly after `after`.
@@ -148,5 +139,37 @@ mod tests {
         let s: State = serde_json::from_str("{}").unwrap();
         assert_eq!(s.next_due, 0);
         assert_eq!(s.deferrals, 0);
+    }
+
+    #[test]
+    fn later_is_offered_until_the_limit_and_warns_on_the_last_press() {
+        assert_eq!(
+            later_policy(0, 2),
+            LaterPolicy {
+                show: true,
+                warn: false
+            }
+        );
+        assert_eq!(
+            later_policy(1, 2),
+            LaterPolicy {
+                show: true,
+                warn: true
+            }
+        );
+        assert_eq!(
+            later_policy(2, 2),
+            LaterPolicy {
+                show: false,
+                warn: false
+            }
+        );
+        assert_eq!(
+            later_policy(0, 0),
+            LaterPolicy {
+                show: false,
+                warn: false
+            }
+        );
     }
 }

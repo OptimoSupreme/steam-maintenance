@@ -1,11 +1,12 @@
 //! Battery state from /sys/class/power_supply.
 
+use serde::Serialize;
 use std::fs;
 use std::path::Path;
 
 const POWER_SUPPLY_DIR: &str = "/sys/class/power_supply";
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
 pub struct Battery {
     pub percent: u8,
     pub charging: bool,
@@ -42,6 +43,14 @@ fn attr(path: &Path, name: &str) -> Option<String> {
     fs::read_to_string(path.join(name))
         .ok()
         .map(|s| s.trim().to_string())
+}
+
+/// True when the battery is too low to start an upgrade without a charger.
+pub fn blocks(battery: Option<Battery>, gate: u8) -> bool {
+    match battery {
+        Some(b) if gate > 0 => !b.charging && b.percent < gate,
+        _ => false,
+    }
 }
 
 /// "Charging" and "Full" both mean the machine is on external power.
@@ -136,6 +145,25 @@ mod tests {
         assert_eq!(read_from(&dir), None);
         fs::remove_dir_all(&dir).unwrap();
         assert_eq!(read_from(&dir), None);
+    }
+
+    #[test]
+    fn gate_blocks_a_low_battery_unless_charging_or_disabled() {
+        let low = Some(Battery {
+            percent: 20,
+            charging: false,
+        });
+        assert!(blocks(low, 30));
+        assert!(!blocks(low, 0));
+        assert!(!blocks(low, 20));
+        assert!(!blocks(
+            Some(Battery {
+                percent: 20,
+                charging: true
+            }),
+            30
+        ));
+        assert!(!blocks(None, 30));
     }
 
     #[test]

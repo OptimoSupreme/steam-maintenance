@@ -1,7 +1,5 @@
 //! Runtime configuration, passed by the NixOS module through environment variables.
 
-use std::path::PathBuf;
-
 #[derive(Debug, Clone)]
 pub struct Config {
     /// Flake reference nixos-rebuild builds from, e.g. `github:OptimoSupreme/nixos-configs`.
@@ -14,22 +12,12 @@ pub struct Config {
     pub cache_workflow: String,
     /// When the weekly check becomes due, `Day HH:MM` local time, e.g. `Sun 12:00`.
     pub check_due: String,
-    /// Deferrals allowed before a round becomes mandatory.
+    /// Deferrals allowed before a round installs on its own.
     pub max_deferrals: u32,
     /// Below this battery percentage, Update is disabled unless charging. 0 disables the gate.
     pub battery_gate: u8,
-    /// Script that hands a steam:// URL to the running Steam client.
-    pub protocol_handler: PathBuf,
     /// The root system unit that performs the upgrade.
     pub unit: String,
-    /// Directory holding portrait.png, landscape.png, hero.png, logo.png for the shortcut.
-    pub grid_dir: Option<PathBuf>,
-    /// Send a desktop notification shortly before opening the UI.
-    pub toast: bool,
-    /// Exe path written into the Steam shortcut (stable across generations).
-    pub exe: String,
-    /// Shortcut name shown in the Steam library.
-    pub app_name: String,
 }
 
 fn env(name: &str) -> Option<String> {
@@ -52,20 +40,7 @@ impl Config {
             battery_gate: env("BATTERY_GATE")
                 .and_then(|v| v.parse().ok())
                 .unwrap_or(30),
-            protocol_handler: env("PROTOCOL_HANDLER")
-                .map(PathBuf::from)
-                .unwrap_or_else(|| PathBuf::from("steam")),
             unit: env("UNIT").unwrap_or_else(|| "steam-maintenance-upgrade.service".into()),
-            grid_dir: env("GRID_DIR").map(PathBuf::from),
-            toast: env("TOAST").map(|v| v != "0").unwrap_or(true),
-            exe: env("EXE")
-                .unwrap_or_else(|| "/run/current-system/sw/bin/steam-maintenance".into()),
-            app_name: env("APP_NAME").unwrap_or_else(|| "System Update".into()),
         }
-    }
-
-    /// The Exe field as Steam stores it: double-quoted.
-    pub fn exe_quoted(&self) -> String {
-        format!("\"{}\"", self.exe)
     }
 }

@@ -12,12 +12,18 @@
       pkgs = nixpkgs.legacyPackages.${system};
     in
     {
-      packages.${system}.default = pkgs.callPackage ./package.nix { };
+      packages.${system} = {
+        default = pkgs.callPackage ./package.nix { };
+        plugin = pkgs.callPackage ./plugin/package.nix {
+          steam-maintenance = self.packages.${system}.default;
+        };
+      };
 
       nixosModules.default = ./module.nix;
 
       checks.${system} = {
         package = self.packages.${system}.default;
+        plugin = self.packages.${system}.plugin;
         module =
           (nixpkgs.lib.nixosSystem {
             inherit system;
@@ -30,14 +36,14 @@
 
       devShells.${system}.default = pkgs.mkShell {
         inputsFrom = [ self.packages.${system}.default ];
-        STEAM_MAINTENANCE_FONT_REGULAR = "${pkgs.inter}/share/fonts/truetype/InterVariable.ttf";
-        STEAM_MAINTENANCE_FONT_BOLD = "${pkgs.inter}/share/fonts/truetype/Inter.ttc";
         packages = with pkgs; [
           cargo
           rustc
           clippy
           rustfmt
           rust-analyzer
+          esbuild
+          typescript
         ];
       };
 

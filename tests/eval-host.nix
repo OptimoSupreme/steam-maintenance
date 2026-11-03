@@ -4,9 +4,15 @@
 
 {
   ## Stand-ins for the Jovian options the module reads
-  options.jovian.steam = {
-    enable = lib.mkOption { default = true; };
-    user = lib.mkOption { default = "player"; };
+  options.jovian = {
+    steam = {
+      enable = lib.mkOption { default = true; };
+      user = lib.mkOption { default = "player"; };
+    };
+    decky-loader = {
+      enable = lib.mkOption { default = true; };
+      stateDir = lib.mkOption { default = "/var/lib/decky-loader"; };
+    };
   };
 
   config = {
