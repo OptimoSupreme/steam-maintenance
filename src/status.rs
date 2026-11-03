@@ -127,6 +127,43 @@ pub fn heartbeat_fresh(max_age: Duration) -> bool {
     false
 }
 
+const REQUEST_FILE: &str = "request.json";
+
+/// What the UI asked the worker to install, written next to the heartbeat right
+/// before `systemctl start`, so the worker builds the commit the user saw.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Request {
+    pub rev: String,
+    pub requested_at: u64,
+}
+
+/// Record the commit the UI is about to install.
+pub fn write_request(rev: &str) -> Result<()> {
+    let Some(dir) = std::env::var_os("XDG_RUNTIME_DIR") else {
+        return Ok(());
+    };
+    let req = Request {
+        rev: rev.to_string(),
+        requested_at: now(),
+    };
+    atomic_write(
+        &Path::new(&dir).join(HEARTBEAT_DIR).join(REQUEST_FILE),
+        &serde_json::to_vec(&req)?,
+    )
+}
+
+/// The freshest request under /run/user/*/ no older than `max_age`. Root reads this.
+pub fn read_request(max_age: Duration) -> Option<Request> {
+    let users = fs::read_dir("/run/user").ok()?;
+    let cutoff = now().saturating_sub(max_age.as_secs());
+    users
+        .flatten()
+        .filter_map(|e| fs::read(e.path().join(HEARTBEAT_DIR).join(REQUEST_FILE)).ok())
+        .filter_map(|b| serde_json::from_slice::<Request>(&b).ok())
+        .filter(|r| r.requested_at >= cutoff && !r.rev.is_empty())
+        .max_by_key(|r| r.requested_at)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
