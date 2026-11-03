@@ -3,6 +3,7 @@
 //! Runs inside the system unit. Progress is read from nix's internal-json log on
 //! stderr and published to /run/steam-maintenance/status.json for the UI.
 
+use crate::check;
 use crate::config::Config;
 use crate::nixlog::Progress;
 use crate::status::{self, Counter, Phase, Status};
@@ -22,6 +23,8 @@ const WRITE_INTERVAL: Duration = Duration::from_millis(250);
 /// How long to wait for the UI heartbeat before leaving the generation staged.
 const HEARTBEAT_WAIT: Duration = Duration::from_secs(60);
 const HEARTBEAT_MAX_AGE: Duration = Duration::from_secs(10);
+/// A UI request older than this was for an earlier run; resolve the branch head instead.
+const REQUEST_MAX_AGE: Duration = Duration::from_secs(600);
 /// Lowercase fragments that mark switch-to-configuration output.
 const INSTALL_MARKERS: &[&str] = &[
     "switch-to-configuration",
@@ -93,8 +96,16 @@ pub fn run(cfg: &Config) -> Result<()> {
         display(&booted)
     );
 
+    let (flake, rev) = resolve_flake(cfg);
+    eprintln!("worker: building {flake}");
+    status.detail = match &rev {
+        Some(rev) => format!("Fetching {}", short(rev)),
+        None => "Fetching".into(),
+    };
+    status.write()?;
+
     let mut progress = Progress::new();
-    let exit = rebuild(cfg, &mut progress, &mut status)?;
+    let exit = rebuild(&flake, &mut progress, &mut status)?;
     if !exit.success() {
         return fail(&mut status, &progress, exit);
     }
@@ -120,14 +131,37 @@ fn display(path: &Option<PathBuf>) -> String {
         .unwrap_or_else(|| "?".into())
 }
 
+fn short(rev: &str) -> String {
+    rev.chars().take(7).collect()
+}
+
+/// The flake reference to build and the commit it is pinned to, if any. The UI gated
+/// on the cache for one commit, so build that commit: the one it asked for, else the
+/// branch head right now, else (offline) whatever `--refresh` resolves.
+fn resolve_flake(cfg: &Config) -> (String, Option<String>) {
+    let rev = status::read_request(REQUEST_MAX_AGE)
+        .map(|req| req.rev)
+        .or_else(|| check::remote_rev(cfg));
+    match rev {
+        Some(rev) => (pinned_ref(&cfg.flake, &rev), Some(rev)),
+        None => (cfg.flake.clone(), None),
+    }
+}
+
+/// `github:owner/repo` with a commit appended as its third path segment.
+fn pinned_ref(flake: &str, rev: &str) -> String {
+    format!("{flake}/{rev}")
+}
+
 /// Run nixos-rebuild, streaming its stderr into `progress` and `status`.
-fn rebuild(cfg: &Config, progress: &mut Progress, status: &mut Status) -> Result<ExitStatus> {
+fn rebuild(flake: &str, progress: &mut Progress, status: &mut Status) -> Result<ExitStatus> {
     let mut child = Command::new("nixos-rebuild")
         .args([
             "boot",
             "--flake",
-            &cfg.flake,
+            flake,
             "--refresh",
+            "--no-reexec",
             "--log-format",
             "internal-json",
             "-v",
@@ -167,8 +201,7 @@ pub fn handle_line<P: ProgressSource>(line: &str, progress: &mut P, status: &mut
         return Update::None;
     }
     eprintln!("{line}");
-    if status.phase != Phase::Installing && progress.started() && looks_like_install(line, progress)
-    {
+    if status.phase != Phase::Installing && progress.started() && looks_like_install(line) {
         mark_installing(status);
         return Update::Phase;
     }
@@ -194,10 +227,12 @@ fn apply_progress<P: ProgressSource>(progress: &P, status: &mut Status) -> Updat
     }
 }
 
-/// A non-JSON line after nix finished its work comes from switch-to-configuration.
-fn looks_like_install<P: ProgressSource>(line: &str, progress: &P) -> bool {
+/// A non-JSON line naming the bootloader comes from switch-to-configuration. Full
+/// progress alone is no sign: nixos-rebuild prints between nix builds, and a
+/// successful exit marks Installing anyway.
+fn looks_like_install(line: &str) -> bool {
     let lower = line.to_ascii_lowercase();
-    INSTALL_MARKERS.iter().any(|m| lower.contains(m)) || progress.percent() == Some(100)
+    INSTALL_MARKERS.iter().any(|m| lower.contains(m))
 }
 
 fn mark_installing(status: &mut Status) {
@@ -417,13 +452,63 @@ mod tests {
     }
 
     #[test]
-    fn any_plain_line_at_full_progress_is_install() {
+    fn plain_line_at_full_progress_is_not_install() {
         let mut p = Fake::default();
         let mut s = Status::new(Phase::Evaluating);
         handle_line("progress 2/2 0/0 done", &mut p, &mut s);
-        assert_eq!(handle_line("Copying files", &mut p, &mut s), Update::Phase);
-        assert_eq!(s.phase, Phase::Installing);
+        assert_eq!(handle_line("Copying files", &mut p, &mut s), Update::None);
+        assert_eq!(s.phase, Phase::Downloading);
+        assert!(s.cancellable);
         assert_eq!(s.percent, Some(100));
+    }
+
+    /// nixos-rebuild runs more than one nix build; the second must not inherit the
+    /// first one's 100% or be mistaken for the install step.
+    #[test]
+    fn second_nix_build_starts_from_zero_and_stays_cancellable() {
+        let mut p = Progress::new();
+        let mut s = Status::new(Phase::Evaluating);
+        for line in include_str!("../tests/fixtures/nix-log-download.jsonl").lines() {
+            handle_line(line, &mut p, &mut s);
+        }
+        assert_eq!(s.percent, Some(100));
+        assert_eq!(s.phase, Phase::Downloading);
+
+        assert_eq!(
+            handle_line("building the system configuration...", &mut p, &mut s),
+            Update::None
+        );
+        assert_eq!(s.phase, Phase::Downloading);
+        assert!(s.cancellable);
+
+        handle_line(
+            r#"@nix {"action":"start","id":900,"level":0,"parent":0,"text":"","type":103}"#,
+            &mut p,
+            &mut s,
+        );
+        handle_line(
+            r#"@nix {"action":"result","fields":[10,300,4,0],"id":900,"type":105}"#,
+            &mut p,
+            &mut s,
+        );
+        assert_eq!(s.phase, Phase::Downloading);
+        assert_eq!(s.percent, Some(3));
+        assert_eq!(
+            s.copies,
+            Counter {
+                done: 10,
+                expected: 300
+            }
+        );
+        assert!(s.cancellable);
+    }
+
+    #[test]
+    fn pinned_ref_appends_the_commit() {
+        assert_eq!(
+            pinned_ref("github:OptimoSupreme/nixos-configs", "0123abc"),
+            "github:OptimoSupreme/nixos-configs/0123abc"
+        );
     }
 
     #[test]

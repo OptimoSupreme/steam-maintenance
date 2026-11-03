@@ -209,6 +209,7 @@ in
         if (action.id == "org.freedesktop.systemd1.manage-units" &&
             action.lookup("unit") == "${unit}" &&
             (action.lookup("verb") == "start" || action.lookup("verb") == "stop") &&
+            subject.local && subject.active &&
             subject.user == "${cfg.user}") {
           return polkit.Result.YES;
         }

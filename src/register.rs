@@ -1,30 +1,40 @@
 //! Keep the "System Update" non-Steam shortcut in every Steam user's shortcuts.vdf.
 //!
 //! Steam rewrites shortcuts.vdf when it exits, so this runs while Steam is down
-//! (the NixOS module calls it at session start, before Steam). It upserts one entry
-//! per userdata directory, copies the grid art Steam shows for that entry, and
-//! remembers the app id so `check` can launch the shortcut by `steam://rungameid/`.
+//! (the NixOS module calls it at session start, before Steam, as the Steam user).
+//! It upserts one entry per userdata directory, seeds the grid art Steam shows for
+//! that entry when the entry is new, and remembers the app id of the most recently
+//! used account so `check` can launch the shortcut by `steam://rungameid/`.
 
 use crate::config::Config;
 use crate::state::State;
 use crate::util::{atomic_write, home_dir};
 use crate::vdf::{self, Value};
-use anyhow::{Context, Result};
+use anyhow::{bail, Context, Result};
 use std::collections::HashSet;
 use std::fs;
+use std::os::unix::fs::MetadataExt;
 use std::path::{Path, PathBuf};
 
 const SHORTCUTS_FILE: &str = "shortcuts.vdf";
 const BACKUP_FILE: &str = "shortcuts.vdf.bak";
+const GRID_DIR: &str = "grid";
 /// Steam library roots relative to `$HOME`.
 const STEAM_ROOTS: [&str; 2] = [".steam/steam", ".local/share/Steam"];
+/// Which account used Steam last, relative to a Steam root.
+const LOGIN_USERS_FILE: &str = "config/loginusers.vdf";
+/// steamid64 of account id 0; userdata directories are named by the account id.
+const STEAMID64_BASE: u64 = 76_561_197_960_265_728;
 /// `(source name in grid_dir, suffix after the app id in config/grid)`.
 const GRID_ART: [(&str, &str); 4] = [
     ("portrait.png", "p.png"),
     ("landscape.png", ".png"),
     ("hero.png", "_hero.png"),
-    ("logo.png", "_logo.png"),
+    ("logo.png", LOGO_SUFFIX),
 ];
+/// The copied logo doubles as the shortcut icon: unlike a store path it survives rebuilds.
+const LOGO_SUFFIX: &str = "_logo.png";
+const LOGO_SOURCE: &str = "logo.png";
 
 /// Steam's legacy shortcut id: crc32 of the quoted exe followed by the name, high bit set.
 pub fn shortcut_appid(exe_quoted: &str, app_name: &str) -> u32 {
@@ -54,38 +64,64 @@ impl Outcome {
     }
 }
 
+/// The result of folding the shortcut into a parsed file.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Upsert {
+    pub root: Value,
+    pub appid: u32,
+    /// The tree differs from what was parsed.
+    pub changed: bool,
+    /// The entry is new or its icon was re-pointed, so the grid art should be seeded.
+    pub seed_art: bool,
+}
+
 pub fn run(cfg: &Config) -> Result<()> {
-    let dirs = userdata_config_dirs();
+    if fs::metadata("/proc/self")?.uid() == 0 {
+        bail!(
+            "register must run as the Steam user, not root: the gamescope pre-start hook \
+             does that at session start, so do not run it under sudo"
+        );
+    }
+    let Some(home) = home_dir() else {
+        bail!("HOME is not set");
+    };
+    let dirs = userdata_config_dirs(&home);
     if dirs.is_empty() {
         println!("no Steam userdata found; start Steam once, then register again");
         return Ok(());
     }
-    let mut first_appid = None;
-    for dir in dirs {
+    let preferred = most_recent_account(&home)
+        .and_then(|account| dirs.iter().position(|d| account_id_of(d) == Some(account)));
+
+    let mut appids: Vec<Option<u32>> = Vec::new();
+    for dir in &dirs {
         let path = dir.join(SHORTCUTS_FILE);
-        let (appid, outcome) =
-            register_file(&path, cfg).with_context(|| format!("updating {}", path.display()))?;
-        println!("{} {}", outcome.label(), path.display());
-        if let Some(grid_dir) = &cfg.grid_dir {
-            copy_grid_art(grid_dir, &dir.join("grid"), appid)
-                .with_context(|| format!("copying grid art into {}", dir.display()))?;
+        match register_dir(dir, cfg) {
+            Ok((appid, outcome)) => {
+                println!("{} {}", outcome.label(), path.display());
+                appids.push(Some(appid));
+            }
+            Err(err) => {
+                eprintln!("register: {}: {err:#}", path.display());
+                appids.push(None);
+            }
         }
-        first_appid.get_or_insert(appid);
     }
-    if let Some(appid) = first_appid {
-        let mut state = State::load();
-        state.shortcut_appid = Some(appid);
-        state.save().context("saving state")?;
-    }
+    let saved = preferred
+        .and_then(|i| appids[i])
+        .or_else(|| appids.iter().flatten().next().copied());
+    let Some(appid) = saved else {
+        bail!("no shortcuts.vdf could be updated");
+    };
+    let mut state = State::load();
+    state.shortcut_appid = Some(appid);
+    state.save().context("saving state")?;
     Ok(())
 }
 
 /// `userdata/<id>/config` under every Steam root that exists, deduplicated by
 /// canonical path (`~/.steam/steam` is usually a symlink to `~/.local/share/Steam`).
-fn userdata_config_dirs() -> Vec<PathBuf> {
-    let Some(home) = home_dir() else {
-        return Vec::new();
-    };
+fn userdata_config_dirs(home: &Path) -> Vec<PathBuf> {
     let mut seen = HashSet::new();
     let mut dirs = Vec::new();
     for root in STEAM_ROOTS {
@@ -112,15 +148,33 @@ fn userdata_config_dirs() -> Vec<PathBuf> {
 
 /// A userdata child named by a non-zero account id.
 fn is_user_id(path: &Path) -> bool {
-    path.file_name()
-        .and_then(|n| n.to_str())
-        .and_then(|n| n.parse::<u64>().ok())
-        .is_some_and(|id| id != 0)
+    account_id_of_user_dir(path).is_some_and(|id| id != 0)
 }
 
-/// Upsert the shortcut in one file, backing it up before the first change.
-fn register_file(path: &Path, cfg: &Config) -> Result<(u32, Outcome)> {
-    let old = match fs::read(path) {
+fn account_id_of_user_dir(path: &Path) -> Option<u64> {
+    path.file_name()?.to_str()?.parse().ok()
+}
+
+/// The account id a `userdata/<id>/config` directory belongs to.
+fn account_id_of(config_dir: &Path) -> Option<u64> {
+    account_id_of_user_dir(config_dir.parent()?)
+}
+
+/// The account marked `MostRecent` in the first loginusers.vdf found, as an account id.
+fn most_recent_account(home: &Path) -> Option<u64> {
+    STEAM_ROOTS.iter().find_map(|root| {
+        let text = fs::read_to_string(home.join(root).join(LOGIN_USERS_FILE)).ok()?;
+        most_recent_steamid(&text)?.checked_sub(STEAMID64_BASE)
+    })
+}
+
+/// Upsert the shortcut in one user's config directory, seeding the grid art for a new
+/// entry and backing the file up before changing it.
+fn register_dir(config: &Path, cfg: &Config) -> Result<(u32, Outcome)> {
+    let path = config.join(SHORTCUTS_FILE);
+    let grid = config.join(GRID_DIR);
+    let old = match fs::read(&path) {
+        Ok(bytes) if bytes.is_empty() => None,
         Ok(bytes) => Some(bytes),
         Err(e) if e.kind() == std::io::ErrorKind::NotFound => None,
         Err(e) => return Err(e).context("reading"),
@@ -129,21 +183,30 @@ fn register_file(path: &Path, cfg: &Config) -> Result<(u32, Outcome)> {
         Some(bytes) => vdf::parse(bytes).context("parsing")?,
         None => empty_root(),
     };
-    let (root, appid, changed) = upsert(root, cfg);
-    let bytes = vdf::serialize(&root);
-    if !changed && old.as_deref() == Some(bytes.as_slice()) {
-        return Ok((appid, Outcome::Unchanged));
+    let have_logo = cfg
+        .grid_dir
+        .as_ref()
+        .is_some_and(|d| d.join(LOGO_SOURCE).is_file());
+    let up = upsert(root, cfg, have_logo.then_some(grid.as_path()));
+    if up.seed_art {
+        if let Some(source) = &cfg.grid_dir {
+            copy_grid_art(source, &grid, up.appid).context("copying grid art")?;
+        }
+    }
+    let bytes = vdf::serialize(&up.root);
+    if !up.changed && old.as_deref() == Some(bytes.as_slice()) {
+        return Ok((up.appid, Outcome::Unchanged));
     }
     if old.is_some() {
-        fs::copy(path, path.with_file_name(BACKUP_FILE)).context("backing up")?;
+        fs::copy(&path, path.with_file_name(BACKUP_FILE)).context("backing up")?;
     }
-    atomic_write(path, &bytes)?;
+    atomic_write(&path, &bytes)?;
     let outcome = if old.is_some() {
         Outcome::Updated
     } else {
         Outcome::Created
     };
-    Ok((appid, outcome))
+    Ok((up.appid, outcome))
 }
 
 /// The file Steam writes before any shortcut exists.
@@ -151,16 +214,16 @@ fn empty_root() -> Value {
     Value::Map(vec![(b"shortcuts".to_vec(), Value::map())])
 }
 
-/// Make the parsed file hold the shortcut: update the entry whose `Exe` (or, failing
-/// that, `AppName`) matches, otherwise append one. Returns the new tree, the entry's
-/// app id, and whether anything changed.
-pub fn upsert(mut root: Value, cfg: &Config) -> (Value, u32, bool) {
+/// Make the parsed file hold the shortcut: update the entry whose `Exe` matches,
+/// otherwise append one. `icon_dir` is the user's config/grid directory when a logo
+/// is available to point the icon at.
+pub fn upsert(mut root: Value, cfg: &Config, icon_dir: Option<&Path>) -> Upsert {
     let before = root.clone();
     if root.get("shortcuts").and_then(Value::entries).is_none() {
         root.insert("shortcuts", Value::map());
     }
     let shortcuts = root.get_mut("shortcuts").expect("just ensured");
-    let appid = match find_entry(shortcuts, cfg) {
+    let (appid, seed_art) = match find_entry(shortcuts, cfg) {
         Some(index) => {
             let entry = &mut shortcuts.entries_mut().expect("is a map")[index].1;
             let appid = entry
@@ -168,38 +231,41 @@ pub fn upsert(mut root: Value, cfg: &Config) -> (Value, u32, bool) {
                 .and_then(Value::as_i32)
                 .map(|n| n as u32)
                 .unwrap_or_else(|| shortcut_appid(&cfg.exe_quoted(), &cfg.app_name));
-            update_entry(entry, cfg, appid);
-            appid
+            let icon = icon_path(icon_dir, appid);
+            let repointed = entry.get("icon").and_then(Value::as_bytes) != Some(icon.as_bytes());
+            update_entry(entry, cfg, appid, &icon);
+            (appid, repointed)
         }
         None => {
             let appid = shortcut_appid(&cfg.exe_quoted(), &cfg.app_name);
             let key = next_free_key(shortcuts);
-            let entry = new_entry(cfg, appid);
+            let entry = new_entry(cfg, appid, &icon_path(icon_dir, appid));
             shortcuts
                 .entries_mut()
                 .expect("is a map")
                 .push((key.into_bytes(), entry));
-            appid
+            (appid, true)
         }
     };
     let changed = root != before;
-    (root, appid, changed)
+    Upsert {
+        root,
+        appid,
+        changed,
+        seed_art,
+    }
 }
 
-/// Index of our entry in the shortcuts map: `Exe` equal to the quoted exe wins,
-/// then `AppName` equal to the configured name.
+/// Index of our entry in the shortcuts map: the one whose `Exe` is the quoted exe.
+/// Names are not matched, so a user's own shortcut called the same is left alone.
 fn find_entry(shortcuts: &Value, cfg: &Config) -> Option<usize> {
-    let entries = shortcuts.entries()?;
     let exe = cfg.exe_quoted();
-    let by = |key: &str, want: &str| {
-        entries.iter().position(|(_, entry)| {
-            entry
-                .get(key)
-                .and_then(Value::as_bytes)
-                .is_some_and(|v| v == want.as_bytes())
-        })
-    };
-    by("Exe", &exe).or_else(|| by("AppName", &cfg.app_name))
+    shortcuts.entries()?.iter().position(|(_, entry)| {
+        entry
+            .get("Exe")
+            .and_then(Value::as_bytes)
+            .is_some_and(|v| v == exe.as_bytes())
+    })
 }
 
 /// One past the largest numeric key, or "0" when there is none.
@@ -231,34 +297,35 @@ fn owned_fields(cfg: &Config) -> Vec<(&'static str, Value)> {
     ]
 }
 
-fn icon_path(cfg: &Config) -> Option<String> {
-    cfg.grid_dir
-        .as_ref()
-        .map(|d| d.join("logo.png").to_string_lossy().into_owned())
+/// `<icon_dir>/<appid>_logo.png`, or empty when there is no logo to show.
+fn icon_path(icon_dir: Option<&Path>, appid: u32) -> String {
+    icon_dir
+        .map(|d| {
+            d.join(format!("{appid}{LOGO_SUFFIX}"))
+                .to_string_lossy()
+                .into_owned()
+        })
+        .unwrap_or_default()
 }
 
 /// Overwrite the owned fields of an existing entry; everything else stays.
-fn update_entry(entry: &mut Value, cfg: &Config, appid: u32) {
+fn update_entry(entry: &mut Value, cfg: &Config, appid: u32, icon: &str) {
     for (key, value) in owned_fields(cfg) {
         entry.insert(key, value);
     }
-    if let Some(icon) = icon_path(cfg) {
-        entry.insert("icon", Value::string(&icon));
-    }
+    entry.insert("icon", Value::string(icon));
     if entry.get("appid").is_none() {
         entry.insert("appid", Value::int32(appid as i32));
     }
 }
 
 /// A complete entry with today's Steam key spellings and order.
-fn new_entry(cfg: &Config, appid: u32) -> Value {
+fn new_entry(cfg: &Config, appid: u32, icon: &str) -> Value {
     let mut entry = Value::Map(vec![(b"appid".to_vec(), Value::int32(appid as i32))]);
     // icon and ShortcutPath sit between StartDir and LaunchOptions in Steam's order.
     let mut fields = owned_fields(cfg);
-    let icon = ("icon", Value::string(&icon_path(cfg).unwrap_or_default()));
-    let shortcut_path = ("ShortcutPath", Value::string(""));
-    fields.insert(3, icon);
-    fields.insert(4, shortcut_path);
+    fields.insert(3, ("icon", Value::string(icon)));
+    fields.insert(4, ("ShortcutPath", Value::string("")));
     for (key, value) in fields {
         entry.insert(key, value);
     }
@@ -287,9 +354,81 @@ fn copy_grid_art(grid_dir: &Path, dest_dir: &Path, appid: u32) -> Result<()> {
     Ok(())
 }
 
+// ---- loginusers.vdf ------------------------------------------------------
+
+/// A token of text KeyValues: a brace or the contents of a quoted string.
+#[derive(Debug, PartialEq, Eq)]
+enum Token<'a> {
+    Open,
+    Close,
+    Str(&'a str),
+}
+
+/// Tolerant scan of text KeyValues: quoted strings and braces, `//` comments dropped,
+/// anything else skipped.
+fn kv_tokens(text: &str) -> Vec<Token<'_>> {
+    let bytes = text.as_bytes();
+    let mut out = Vec::new();
+    let mut i = 0;
+    while i < bytes.len() {
+        match bytes[i] {
+            b'{' => out.push(Token::Open),
+            b'}' => out.push(Token::Close),
+            b'"' => {
+                let start = i + 1;
+                let mut end = start;
+                while end < bytes.len() && bytes[end] != b'"' {
+                    end += if bytes[end] == b'\\' { 2 } else { 1 };
+                }
+                let end = end.min(bytes.len());
+                out.push(Token::Str(&text[start..end]));
+                i = end;
+            }
+            b'/' if bytes.get(i + 1) == Some(&b'/') => {
+                while i < bytes.len() && bytes[i] != b'\n' {
+                    i += 1;
+                }
+            }
+            _ => {}
+        }
+        i += 1;
+    }
+    out
+}
+
+/// The steamid64 whose block carries `"MostRecent" "1"` in loginusers.vdf.
+fn most_recent_steamid(text: &str) -> Option<u64> {
+    let mut depth = 0usize;
+    let mut key: Option<&str> = None;
+    let mut current: Option<u64> = None;
+    for token in kv_tokens(text) {
+        match token {
+            Token::Open => {
+                if depth == 1 {
+                    current = key.and_then(|k| k.parse().ok());
+                }
+                depth += 1;
+                key = None;
+            }
+            Token::Close => {
+                depth = depth.saturating_sub(1);
+                key = None;
+            }
+            Token::Str(s) => match key.take() {
+                None => key = Some(s),
+                Some("MostRecent") if depth == 2 && s == "1" => return current,
+                Some(_) => {}
+            },
+        }
+    }
+    None
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    const GRID: &str = "/home/u/.local/share/Steam/userdata/100/config/grid";
 
     fn cfg(exe: &str, app_name: &str, grid_dir: Option<&str>) -> Config {
         Config {
@@ -329,6 +468,16 @@ mod tests {
         let _ = fs::remove_dir_all(&dir);
         fs::create_dir_all(&dir).unwrap();
         dir
+    }
+
+    /// A grid source directory holding all four artwork files.
+    fn grid_source(dir: &Path) -> PathBuf {
+        let src = dir.join("src");
+        fs::create_dir_all(&src).unwrap();
+        for (name, _) in GRID_ART {
+            fs::write(src.join(name), name).unwrap();
+        }
+        src
     }
 
     fn str_of(entry: &Value, key: &str) -> String {
@@ -371,10 +520,12 @@ mod tests {
     #[test]
     fn upsert_appends_a_complete_entry_to_an_empty_file() {
         let cfg = default_cfg();
-        let (root, appid, changed) = upsert(empty_root(), &cfg);
-        assert!(changed);
+        let up = upsert(empty_root(), &cfg, Some(Path::new(GRID)));
+        assert!(up.changed);
+        assert!(up.seed_art);
+        let appid = up.appid;
         assert_eq!(appid, shortcut_appid(&cfg.exe_quoted(), "System Update"));
-        let shortcuts = root.get("shortcuts").unwrap().entries().unwrap();
+        let shortcuts = up.root.get("shortcuts").unwrap().entries().unwrap();
         assert_eq!(shortcuts.len(), 1);
         assert_eq!(shortcuts[0].0, b"0");
         let entry = &shortcuts[0].1;
@@ -413,24 +564,25 @@ mod tests {
             "\"/run/current-system/sw/bin/steam-maintenance\""
         );
         assert_eq!(str_of(entry, "StartDir"), "/");
-        assert_eq!(str_of(entry, "icon"), "/nix/store/abc-grid/logo.png");
+        assert_eq!(str_of(entry, "icon"), format!("{GRID}/{appid}_logo.png"));
         assert_eq!(i32_of(entry, "AllowOverlay"), 1);
         assert_eq!(i32_of(entry, "OpenVR"), 0);
         assert_eq!(i32_of(entry, "LastPlayTime"), 0);
         let tags = entry.get("tags").unwrap();
         assert_eq!(str_of(tags, "0"), "favorite");
         // A file Steam can read back.
-        assert_eq!(vdf::parse(&vdf::serialize(&root)).unwrap(), root);
+        assert_eq!(vdf::parse(&vdf::serialize(&up.root)).unwrap(), up.root);
     }
 
     #[test]
-    fn upsert_without_grid_dir_leaves_icon_empty_and_untouched() {
+    fn upsert_without_logo_leaves_icon_empty_and_untouched() {
         let cfg = cfg("/bin/sm", "System Update", None);
-        let (root, _, _) = upsert(empty_root(), &cfg);
-        assert_eq!(str_of(our_entry(&root, &cfg), "icon"), "");
-        let (root, _, changed) = upsert(root, &cfg);
-        assert!(!changed);
-        assert_eq!(str_of(our_entry(&root, &cfg), "icon"), "");
+        let up = upsert(empty_root(), &cfg, None);
+        assert_eq!(str_of(our_entry(&up.root, &cfg), "icon"), "");
+        let again = upsert(up.root, &cfg, None);
+        assert!(!again.changed);
+        assert!(!again.seed_art);
+        assert_eq!(str_of(our_entry(&again.root, &cfg), "icon"), "");
     }
 
     #[test]
@@ -438,16 +590,16 @@ mod tests {
         let cfg = default_cfg();
         let original = fixture("shortcuts-steam_rom_manager.vdf");
         let root = vdf::parse(&original).unwrap();
-        let (new_root, appid, changed) = upsert(root.clone(), &cfg);
-        assert!(changed);
+        let up = upsert(root.clone(), &cfg, Some(Path::new(GRID)));
+        assert!(up.changed);
         let old_entries = root.get("shortcuts").unwrap().entries().unwrap();
-        let new_entries = new_root.get("shortcuts").unwrap().entries().unwrap();
+        let new_entries = up.root.get("shortcuts").unwrap().entries().unwrap();
         assert_eq!(new_entries.len(), old_entries.len() + 1);
         assert_eq!(&new_entries[..old_entries.len()], &old_entries[..]);
         assert_eq!(new_entries.last().unwrap().0, b"4");
-        assert_eq!(i32_of(&new_entries[4].1, "appid") as u32, appid);
+        assert_eq!(i32_of(&new_entries[4].1, "appid") as u32, up.appid);
         // The old entries are still byte-identical in the serialized file.
-        let bytes = vdf::serialize(&new_root);
+        let bytes = vdf::serialize(&up.root);
         let prefix_len = original.len() - 2;
         assert_eq!(&bytes[..prefix_len], &original[..prefix_len]);
         assert_eq!(&bytes[bytes.len() - 2..], b"\x08\x08");
@@ -456,13 +608,15 @@ mod tests {
     #[test]
     fn upsert_twice_is_a_no_op() {
         let cfg = default_cfg();
+        let grid = Some(Path::new(GRID));
         let root = vdf::parse(&fixture("shortcuts-shortcuts.vdf")).unwrap();
-        let (once, appid1, changed1) = upsert(root, &cfg);
-        let (twice, appid2, changed2) = upsert(once.clone(), &cfg);
-        assert!(changed1);
-        assert!(!changed2);
-        assert_eq!(appid1, appid2);
-        assert_eq!(vdf::serialize(&once), vdf::serialize(&twice));
+        let once = upsert(root, &cfg, grid);
+        let twice = upsert(once.root.clone(), &cfg, grid);
+        assert!(once.changed);
+        assert!(!twice.changed);
+        assert!(!twice.seed_art);
+        assert_eq!(once.appid, twice.appid);
+        assert_eq!(vdf::serialize(&once.root), vdf::serialize(&twice.root));
     }
 
     #[test]
@@ -475,10 +629,10 @@ mod tests {
             fixture_appid as u32,
             shortcut_appid(&cfg.exe_quoted(), &cfg.app_name)
         );
-        let (new_root, appid, changed) = upsert(root, &cfg);
-        assert!(changed);
-        assert_eq!(appid, fixture_appid as u32);
-        let shortcuts = new_root.get("shortcuts").unwrap().entries().unwrap();
+        let up = upsert(root, &cfg, None);
+        assert!(up.changed);
+        assert_eq!(up.appid, fixture_appid as u32);
+        let shortcuts = up.root.get("shortcuts").unwrap().entries().unwrap();
         assert_eq!(shortcuts.len(), 1, "updated in place, not appended");
         let entry = &shortcuts[0].1;
         assert_eq!(i32_of(entry, "appid"), fixture_appid);
@@ -511,21 +665,42 @@ mod tests {
     }
 
     #[test]
-    fn upsert_falls_back_to_matching_by_app_name() {
+    fn upsert_repoints_the_icon_once_and_reseeds_art_only_then() {
+        let cfg = default_cfg();
+        let root = vdf::parse(&fixture("shortcuts-linux_shortcut.vdf")).unwrap();
+        let without = upsert(root, &cfg, None);
+        assert!(without.seed_art, "new entry");
+        let pointed = upsert(without.root, &cfg, Some(Path::new(GRID)));
+        assert!(pointed.changed);
+        assert!(pointed.seed_art, "icon re-pointed");
+        assert_eq!(
+            str_of(our_entry(&pointed.root, &cfg), "icon"),
+            format!("{GRID}/{}_logo.png", pointed.appid)
+        );
+        let settled = upsert(pointed.root, &cfg, Some(Path::new(GRID)));
+        assert!(!settled.changed);
+        assert!(!settled.seed_art);
+    }
+
+    #[test]
+    fn upsert_never_matches_by_name_alone() {
         let cfg = cfg(
             "/run/current-system/sw/bin/steam-maintenance",
             "Spore",
             None,
         );
         let root = vdf::parse(&fixture("shortcuts-shortcutsspore.vdf")).unwrap();
-        let (new_root, appid, _) = upsert(root, &cfg);
-        let shortcuts = new_root.get("shortcuts").unwrap().entries().unwrap();
-        assert_eq!(shortcuts.len(), 1);
-        let entry = &shortcuts[0].1;
-        assert_eq!(i32_of(entry, "appid") as u32, appid);
-        assert_eq!(appid, 0xF768_BA3B, "fixture appid kept");
-        assert_eq!(str_of(entry, "Exe"), cfg.exe_quoted());
-        assert_eq!(str_of(entry, "appname"), "Spore");
+        let up = upsert(root, &cfg, None);
+        let shortcuts = up.root.get("shortcuts").unwrap().entries().unwrap();
+        assert_eq!(
+            shortcuts.len(),
+            2,
+            "the user's Spore shortcut is left alone"
+        );
+        assert_eq!(i32_of(&shortcuts[0].1, "appid") as u32, 0xF768_BA3B);
+        assert_ne!(str_of(&shortcuts[0].1, "Exe"), cfg.exe_quoted());
+        assert_eq!(i32_of(&shortcuts[1].1, "appid") as u32, up.appid);
+        assert_eq!(str_of(&shortcuts[1].1, "Exe"), cfg.exe_quoted());
     }
 
     #[test]
@@ -540,19 +715,23 @@ mod tests {
     }
 
     #[test]
-    fn register_file_creates_then_leaves_unchanged_and_backs_up_before_updating() {
+    fn register_dir_creates_then_leaves_unchanged_and_backs_up_before_updating() {
         let cfg = default_cfg();
         let dir = temp_dir("file");
         let path = dir.join(SHORTCUTS_FILE);
         let bak = dir.join(BACKUP_FILE);
 
-        let (appid, outcome) = register_file(&path, &cfg).unwrap();
+        let (appid, outcome) = register_dir(&dir, &cfg).unwrap();
         assert_eq!(outcome, Outcome::Created);
         assert!(!bak.exists());
         let created = fs::read(&path).unwrap();
-        assert_eq!(vdf::parse(&created).unwrap(), upsert(empty_root(), &cfg).0);
+        assert_eq!(
+            vdf::parse(&created).unwrap(),
+            upsert(empty_root(), &cfg, None).root,
+            "no logo in the store dir, so no icon"
+        );
 
-        let (appid2, outcome) = register_file(&path, &cfg).unwrap();
+        let (appid2, outcome) = register_dir(&dir, &cfg).unwrap();
         assert_eq!(outcome, Outcome::Unchanged);
         assert_eq!(appid, appid2);
         assert_eq!(fs::read(&path).unwrap(), created);
@@ -560,37 +739,94 @@ mod tests {
 
         let original = fixture("shortcuts-shortcuts2.vdf");
         fs::write(&path, &original).unwrap();
-        let (_, outcome) = register_file(&path, &cfg).unwrap();
+        let (_, outcome) = register_dir(&dir, &cfg).unwrap();
         assert_eq!(outcome, Outcome::Updated);
         assert_eq!(fs::read(&bak).unwrap(), original);
         let updated = fs::read(&path).unwrap();
         assert_ne!(updated, original);
-        assert_eq!(register_file(&path, &cfg).unwrap().1, Outcome::Unchanged);
+        assert_eq!(register_dir(&dir, &cfg).unwrap().1, Outcome::Unchanged);
         assert_eq!(fs::read(&path).unwrap(), updated);
         fs::remove_dir_all(dir).unwrap();
     }
 
     #[test]
-    fn register_file_refuses_a_corrupt_file() {
+    fn register_dir_treats_an_empty_file_as_empty_shortcuts() {
+        let cfg = default_cfg();
+        let dir = temp_dir("empty");
+        let path = dir.join(SHORTCUTS_FILE);
+        fs::write(&path, b"").unwrap();
+        let (_, outcome) = register_dir(&dir, &cfg).unwrap();
+        assert_eq!(outcome, Outcome::Created);
+        assert!(!dir.join(BACKUP_FILE).exists());
+        assert_eq!(
+            vdf::parse(&fs::read(&path).unwrap()).unwrap(),
+            upsert(empty_root(), &cfg, None).root
+        );
+        fs::remove_dir_all(dir).unwrap();
+    }
+
+    #[test]
+    fn register_dir_refuses_a_corrupt_file() {
         let dir = temp_dir("corrupt");
         let path = dir.join(SHORTCUTS_FILE);
         let mut bytes = fixture("shortcuts-linux_shortcut.vdf");
         bytes.truncate(bytes.len() - 3);
         fs::write(&path, &bytes).unwrap();
-        assert!(register_file(&path, &default_cfg()).is_err());
+        assert!(register_dir(&dir, &default_cfg()).is_err());
         assert_eq!(fs::read(&path).unwrap(), bytes, "left untouched");
+        fs::remove_dir_all(dir).unwrap();
+    }
+
+    #[test]
+    fn register_dir_seeds_art_once_and_points_the_icon_at_the_copied_logo() {
+        let dir = temp_dir("seed");
+        let src = grid_source(&dir);
+        let config = dir.join("userdata/100/config");
+        fs::create_dir_all(&config).unwrap();
+        let with_art = cfg("/bin/sm", "System Update", Some(src.to_str().unwrap()));
+
+        let (appid, outcome) = register_dir(&config, &with_art).unwrap();
+        assert_eq!(outcome, Outcome::Created);
+        let logo = config.join(GRID_DIR).join(format!("{appid}_logo.png"));
+        assert_eq!(fs::read(&logo).unwrap(), b"logo.png");
+        assert!(config
+            .join(GRID_DIR)
+            .join(format!("{appid}p.png"))
+            .is_file());
+        let root = vdf::parse(&fs::read(config.join(SHORTCUTS_FILE)).unwrap()).unwrap();
+        assert_eq!(
+            str_of(our_entry(&root, &with_art), "icon"),
+            logo.to_string_lossy()
+        );
+
+        // Art the user removed through Steam stays removed.
+        fs::remove_file(config.join(GRID_DIR).join(format!("{appid}_hero.png"))).unwrap();
+        assert_eq!(
+            register_dir(&config, &with_art).unwrap().1,
+            Outcome::Unchanged
+        );
+        assert!(!config
+            .join(GRID_DIR)
+            .join(format!("{appid}_hero.png"))
+            .exists());
+
+        // A rebuilt package (new store path) changes nothing in the file.
+        let moved = dir.join("src2");
+        fs::rename(&src, &moved).unwrap();
+        let rebuilt = cfg("/bin/sm", "System Update", Some(moved.to_str().unwrap()));
+        assert_eq!(
+            register_dir(&config, &rebuilt).unwrap().1,
+            Outcome::Unchanged
+        );
+        assert!(!config.join(BACKUP_FILE).exists());
         fs::remove_dir_all(dir).unwrap();
     }
 
     #[test]
     fn grid_art_is_copied_only_where_missing() {
         let dir = temp_dir("grid");
-        let src = dir.join("src");
+        let src = grid_source(&dir);
         let dest = dir.join("config/grid");
-        fs::create_dir_all(&src).unwrap();
-        for (name, _) in GRID_ART {
-            fs::write(src.join(name), name).unwrap();
-        }
         fs::create_dir_all(&dest).unwrap();
         fs::write(dest.join("42_hero.png"), "user art").unwrap();
 
@@ -616,5 +852,75 @@ mod tests {
         assert!(is_user_id(Path::new("/x/userdata/10342635")));
         assert!(!is_user_id(Path::new("/x/userdata/0")));
         assert!(!is_user_id(Path::new("/x/userdata/anonymous")));
+        assert_eq!(
+            account_id_of(Path::new("/x/userdata/10342635/config")),
+            Some(10342635)
+        );
+    }
+
+    const LOGIN_USERS: &str = r#""users"
+{
+	"76561197970531363"
+	{
+		"AccountName"		"first"
+		"PersonaName"		"First \"Quoted\" User"
+		"RememberPassword"		"1"
+		"MostRecent"		"0"
+		"Timestamp"		"1700000000"
+	}
+	// a comment with "MostRecent" "1" in it
+	"76561198012345678"
+	{
+		"AccountName"		"second"
+		"PersonaName"		"Second"
+		"MostRecent"		"1"
+		"Timestamp"		"1700000001"
+	}
+}
+"#;
+
+    #[test]
+    fn most_recent_account_comes_from_loginusers() {
+        assert_eq!(most_recent_steamid(LOGIN_USERS), Some(76561198012345678));
+        assert_eq!(
+            76561198012345678 - STEAMID64_BASE,
+            52_079_950,
+            "account id is the steamid64 offset"
+        );
+        let none = LOGIN_USERS.replace("\"MostRecent\"\t\t\"1\"", "\"MostRecent\"\t\t\"0\"");
+        assert_eq!(most_recent_steamid(&none), None);
+        assert_eq!(most_recent_steamid(""), None);
+        assert_eq!(
+            most_recent_steamid("\"users\" { \"x\" { \"MostRecent\" \"1\""),
+            None
+        );
+        assert_eq!(
+            most_recent_steamid("\"MostRecent\" \"1\""),
+            None,
+            "top level"
+        );
+
+        let dir = temp_dir("login");
+        let root = dir.join(".local/share/Steam");
+        fs::create_dir_all(root.join("config")).unwrap();
+        fs::write(root.join(LOGIN_USERS_FILE), LOGIN_USERS).unwrap();
+        assert_eq!(most_recent_account(&dir), Some(52_079_950));
+        fs::remove_dir_all(dir).unwrap();
+    }
+
+    #[test]
+    fn kv_tokens_are_tolerant() {
+        assert_eq!(
+            kv_tokens("\"a\" { \"b\" \"c\\\"d\" } junk \"unterminated"),
+            vec![
+                Token::Str("a"),
+                Token::Open,
+                Token::Str("b"),
+                Token::Str("c\\\"d"),
+                Token::Close,
+                Token::Str("unterminated"),
+            ]
+        );
+        assert_eq!(kv_tokens("\"é\\"), vec![Token::Str("é\\")]);
     }
 }

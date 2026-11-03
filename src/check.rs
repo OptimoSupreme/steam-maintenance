@@ -28,6 +28,9 @@ const TOAST_DELAY: Duration = Duration::from_secs(30);
 /// After a prompt the check stays quiet for an hour.
 const SNOOZE_SECS: u64 = 3600;
 const MAX_SUBJECTS: usize = 20;
+/// Upper bound on any network call, so a black-holed link cannot stall the check.
+const NETWORK_TIMEOUT_SECS: &str = "30";
+const CONNECT_TIMEOUT_SECS: &str = "10";
 
 /// What the fleet repo offers versus what this machine runs.
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
@@ -237,6 +240,7 @@ fn is_steam_launch(proc_entry: &Path) -> bool {
 }
 
 /// Seconds since the user's Steam unit became active; None unless it is active.
+/// Wall-clock, so time spent suspended does not count as Steam being up.
 pub fn steam_uptime_secs() -> Option<u64> {
     let show = run_opt(
         "systemctl",
@@ -247,30 +251,31 @@ pub fn steam_uptime_secs() -> Option<u64> {
             "-p",
             "ActiveState",
             "-p",
-            "ActiveEnterTimestampMonotonic",
+            "ActiveEnterTimestamp",
+            "--timestamp=unix",
         ],
     )?;
-    let uptime = fs::read_to_string("/proc/uptime").ok()?;
-    uptime_from(&show, &uptime)
+    uptime_from(&show, now())
 }
 
-/// Combine `systemctl show` output with /proc/uptime. The monotonic timestamp is in microseconds.
-fn uptime_from(show: &str, proc_uptime: &str) -> Option<u64> {
+/// Seconds between `systemctl show --timestamp=unix` output (`ActiveEnterTimestamp=@1762102800`)
+/// and `now`, None unless the unit is active.
+fn uptime_from(show: &str, now: u64) -> Option<u64> {
     let mut active = false;
-    let mut entered_us = None;
+    let mut entered = None;
     for line in show.lines() {
         match line.split_once('=') {
             Some(("ActiveState", v)) => active = v.trim() == "active",
-            Some(("ActiveEnterTimestampMonotonic", v)) => entered_us = v.trim().parse::<u64>().ok(),
+            Some(("ActiveEnterTimestamp", v)) => {
+                entered = v.trim().trim_start_matches('@').parse::<u64>().ok()
+            }
             _ => {}
         }
     }
     if !active {
         return None;
     }
-    let entered = entered_us? / 1_000_000;
-    let uptime = proc_uptime.split_whitespace().next()?.parse::<f64>().ok()? as u64;
-    Some(uptime.saturating_sub(entered))
+    Some(now.saturating_sub(entered?))
 }
 
 // ---- probes --------------------------------------------------------------
@@ -279,10 +284,15 @@ fn local_rev() -> Option<String> {
     run_opt("nixos-version", &["--json"]).and_then(|json| configuration_revision(&json))
 }
 
-fn remote_rev(cfg: &Config) -> Option<String> {
+/// Head of the followed branch on GitHub; None when offline or after the timeout.
+pub fn remote_rev(cfg: &Config) -> Option<String> {
     let url = format!("https://github.com/{}", cfg.repo);
     let refspec = format!("refs/heads/{}", cfg.branch);
-    run_opt("git", &["ls-remote", &url, &refspec]).and_then(|out| first_field(&out))
+    run_opt(
+        "timeout",
+        &[NETWORK_TIMEOUT_SECS, "git", "ls-remote", &url, &refspec],
+    )
+    .and_then(|out| first_field(&out))
 }
 
 fn cache_ready(cfg: &Config, rev: &str) -> bool {
@@ -312,6 +322,10 @@ fn github_get(path: &str) -> Option<String> {
         "curl",
         &[
             "-sf",
+            "--connect-timeout",
+            CONNECT_TIMEOUT_SECS,
+            "--max-time",
+            NETWORK_TIMEOUT_SECS,
             "-H",
             "Accept: application/vnd.github+json",
             "-H",
@@ -437,16 +451,21 @@ mod tests {
     }
 
     #[test]
-    fn steam_uptime_from_systemctl_and_proc() {
-        let show = "ActiveState=active\nActiveEnterTimestampMonotonic=1500000000\n";
-        assert_eq!(uptime_from(show, "1700.42 6000.00\n"), Some(200));
-        let inactive = "ActiveState=inactive\nActiveEnterTimestampMonotonic=0\n";
-        assert_eq!(uptime_from(inactive, "1700.42 6000.00\n"), None);
+    fn steam_uptime_from_unix_timestamps() {
+        let show = "ActiveState=active\nActiveEnterTimestamp=@1762102800\n";
+        assert_eq!(uptime_from(show, 1_762_103_000), Some(200));
         assert_eq!(
-            uptime_from("ActiveState=active\n", "1700.42 6000.00\n"),
+            uptime_from(show, 1_762_102_000),
+            Some(0),
+            "clock stepped back"
+        );
+        let inactive = "ActiveState=inactive\nActiveEnterTimestamp=\n";
+        assert_eq!(uptime_from(inactive, 1_762_103_000), None);
+        assert_eq!(uptime_from("ActiveState=active\n", 1_762_103_000), None);
+        assert_eq!(
+            uptime_from("ActiveState=active\nActiveEnterTimestamp=garbage\n", 1),
             None
         );
-        assert_eq!(uptime_from(show, "garbage"), None);
     }
 
     #[test]

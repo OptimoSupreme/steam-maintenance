@@ -13,6 +13,9 @@
 //!   aggregate stops can still count a finished goal as pending. `done` is kept
 //!   monotonic, `expected` follows nix and closes onto `done` when the aggregate stops
 //!   without failures, and the percentage is held monotonic with a high-water mark.
+//! - One nixos-rebuild run can hold several nix builds (fetching the flake, then the
+//!   system). A fresh top-level aggregate after the previous ones stopped starts the
+//!   counters and the high-water mark over, so the second build is not pinned at 100%.
 
 use crate::status::{Counter, Phase};
 use serde::Deserialize;
@@ -27,6 +30,7 @@ const BUILD_WEIGHT: u64 = 3;
 // Activity types.
 const ACT_COPY_PATH: u64 = 100;
 const ACT_FILE_TRANSFER: u64 = 101;
+const ACT_REALISE: u64 = 102;
 const ACT_COPY_PATHS: u64 = 103;
 const ACT_BUILDS: u64 = 104;
 const ACT_BUILD: u64 = 105;
@@ -158,9 +162,15 @@ impl Progress {
             ACT_BUILD => derivation_name(subject),
             ACT_COPY_PATH | ACT_SUBSTITUTE => store_path_name(subject),
             ACT_FILE_TRANSFER => file_name(subject),
-            ACT_COPY_PATHS | ACT_BUILDS => String::new(),
+            ACT_REALISE | ACT_COPY_PATHS | ACT_BUILDS => String::new(),
             _ => return,
         };
+        if e.parent == 0
+            && is_aggregate(e.kind)
+            && !self.open.values().any(|a| is_aggregate(a.kind))
+        {
+            self.reset_counters();
+        }
         self.next_seq += 1;
         self.open.insert(
             e.id,
@@ -175,6 +185,13 @@ impl Progress {
             },
         );
         self.refresh_detail();
+    }
+
+    /// A new nix build is starting: what the previous one counted no longer applies.
+    fn reset_counters(&mut self) {
+        self.copies = Counter::default();
+        self.builds = Counter::default();
+        self.high_water = None;
     }
 
     /// An aggregate that stops without failures has done everything it expected, even
@@ -341,6 +358,11 @@ fn fraction(c: Counter) -> f64 {
 
 fn is_download(kind: u64) -> bool {
     matches!(kind, ACT_COPY_PATH | ACT_SUBSTITUTE | ACT_FILE_TRANSFER)
+}
+
+/// The activities nix opens once per build to report totals under.
+fn is_aggregate(kind: u64) -> bool {
+    matches!(kind, ACT_REALISE | ACT_COPY_PATHS | ACT_BUILDS)
 }
 
 fn field_str(fields: &[Value], i: usize) -> Option<&str> {
@@ -540,7 +562,7 @@ mod tests {
         feed_all(
             &mut p,
             &[
-                start(1, 102, 0, "[]"),
+                start(1, ACT_REALISE, 0, "[]"),
                 result(1, RES_SET_EXPECTED, "[105, 3]"),
                 result(1, RES_SET_EXPECTED, "[108, 5]"),
                 result(1, RES_SET_EXPECTED, "[100, 52448]"),
@@ -634,6 +656,44 @@ mod tests {
             "a failure keeps it open"
         );
         assert_eq!(p.percent(), Some(86));
+    }
+
+    #[test]
+    fn a_second_build_starts_the_counters_over() {
+        let mut p = Progress::new();
+        for line in DOWNLOAD.lines() {
+            assert!(p.feed_line(line));
+        }
+        assert_eq!(p.percent(), Some(100));
+        assert!(p.copies.expected > 0);
+
+        // The real system build opens its own realise/builds/copyPaths aggregates.
+        feed_all(
+            &mut p,
+            &[
+                start(50, ACT_REALISE, 0, "[]"),
+                start(51, ACT_BUILDS, 0, "[]"),
+                start(52, ACT_COPY_PATHS, 0, "[]"),
+            ],
+        );
+        assert_eq!(p.copies, Counter::default());
+        assert_eq!(p.builds, Counter::default());
+        assert_eq!(p.percent(), None, "nothing expected yet");
+
+        feed_all(&mut p, &[result(52, RES_PROGRESS, "[10, 300, 4, 0]")]);
+        assert_eq!(p.percent(), Some(3));
+        assert_eq!(p.phase_hint(), Some(Phase::Downloading));
+
+        // Aggregates opening while another is still open belong to the same build.
+        feed_all(&mut p, &[stop(51), start(53, ACT_BUILDS, 0, "[]")]);
+        assert_eq!(
+            p.copies,
+            Counter {
+                done: 10,
+                expected: 300
+            }
+        );
+        assert_eq!(p.percent(), Some(3));
     }
 
     #[test]

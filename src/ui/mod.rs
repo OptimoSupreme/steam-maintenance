@@ -29,7 +29,9 @@ use sdl2::render::{BlendMode, WindowCanvas};
 use sdl2::surface::Surface;
 use sdl2::GameControllerSubsystem;
 use std::ffi::OsStr;
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::mpsc::{self, Receiver};
+use std::sync::Arc;
 use std::time::{Duration, Instant};
 use text::{Fonts, TextCache};
 
@@ -140,6 +142,7 @@ pub fn run(cfg: &Config, mock: Option<String>, size: Option<(u32, u32)>) -> Resu
                     win_event: WindowEvent::SizeChanged(..) | WindowEvent::Exposed,
                     ..
                 } => app.dirty = true,
+                Event::Window { win_event, .. } => app.window_event(&win_event),
                 other => {
                     if let Some(action) = input::map_event(&other, &mut app.stick) {
                         app.handle(action);
@@ -173,6 +176,77 @@ fn save_screenshot(canvas: &WindowCanvas, path: &OsStr) -> Result<()> {
 
 fn unit_is_active(unit: &str) -> bool {
     run_opt("systemctl", &["is-active", unit]).as_deref() == Some("active")
+}
+
+/// Whether the upgrade unit is active, polled off the render thread.
+#[derive(Clone)]
+struct UnitWatch {
+    active: Arc<AtomicBool>,
+    /// False until the first poll has answered.
+    known: Arc<AtomicBool>,
+}
+
+impl UnitWatch {
+    /// A fixed answer with no poller, for mocks and tests.
+    fn fixed(active: bool) -> UnitWatch {
+        UnitWatch {
+            active: Arc::new(AtomicBool::new(active)),
+            known: Arc::new(AtomicBool::new(true)),
+        }
+    }
+
+    /// Poll `systemctl is-active` every `UNIT_POLL` for as long as the app runs.
+    fn spawn(unit: &str) -> UnitWatch {
+        let watch = UnitWatch {
+            active: Arc::new(AtomicBool::new(false)),
+            known: Arc::new(AtomicBool::new(false)),
+        };
+        let poller = watch.clone();
+        let unit = unit.to_string();
+        std::thread::spawn(move || loop {
+            poller.set(unit_is_active(&unit));
+            std::thread::sleep(UNIT_POLL);
+        });
+        watch
+    }
+
+    fn set(&self, active: bool) {
+        self.active.store(active, Ordering::Relaxed);
+        self.known.store(true, Ordering::Relaxed);
+    }
+
+    fn active(&self) -> bool {
+        self.active.load(Ordering::Relaxed)
+    }
+
+    /// The unit is known to be inactive; an unanswered poll is not a stop.
+    fn stopped(&self) -> bool {
+        self.known.load(Ordering::Relaxed) && !self.active()
+    }
+}
+
+/// `systemctl stop` is still safe: nothing written yet, or a cancellable phase
+/// before the install.
+fn cancellable_now(status: Option<&Status>) -> bool {
+    match status {
+        None => true,
+        Some(s) => {
+            s.cancellable
+                && !matches!(
+                    s.phase,
+                    Phase::Installing
+                        | Phase::Cleaning
+                        | Phase::Done
+                        | Phase::UpToDate
+                        | Phase::Failed
+                )
+        }
+    }
+}
+
+/// The round is over: the deferral count starts again.
+fn round_settled(phase: Option<Phase>) -> bool {
+    matches!(phase, Some(Phase::Done | Phase::UpToDate))
 }
 
 /// The fields of a status that change what is on screen.
@@ -210,7 +284,6 @@ fn same_status(a: &Option<Status>, b: &Option<Status>) -> bool {
 
 struct Polls {
     status: Instant,
-    unit: Instant,
     heartbeat: Instant,
     battery: Instant,
 }
@@ -225,14 +298,21 @@ struct App {
     focus: Option<ButtonId>,
     status: Option<Status>,
     battery: Option<Battery>,
-    unit_active: bool,
+    unit: UnitWatch,
     probe: Option<Receiver<(UpdateInfo, Vec<String>)>>,
+    /// Head of the followed branch as the probe saw it; what Update asks for.
+    remote_rev: Option<String>,
     progress_since: Option<Instant>,
     /// Statuses started before this (unix time) belong to an older run and are ignored.
     start_requested_at: u64,
     cancel_requested: bool,
     done_since: Option<Instant>,
+    /// Deferrals were reset for this run's Done or UpToDate.
+    settled: bool,
     shown_percent: Option<f32>,
+    /// The window has keyboard focus; the heartbeat pauses without it.
+    focused: bool,
+    shown: bool,
     polls: Polls,
     changed_at: Instant,
     started: Instant,
@@ -256,16 +336,19 @@ impl App {
             focus: None,
             status: None,
             battery: None,
-            unit_active: false,
+            unit: UnitWatch::fixed(false),
             probe: None,
+            remote_rev: None,
             progress_since: None,
             start_requested_at: 0,
             cancel_requested: false,
             done_since: None,
+            settled: false,
             shown_percent: None,
+            focused: true,
+            shown: true,
             polls: Polls {
                 status: long_ago,
-                unit: long_ago,
                 heartbeat: long_ago,
                 battery: long_ago,
             },
@@ -282,17 +365,14 @@ impl App {
         let state = State::load();
         let scheduled = state::take_launch_reason().as_deref() == Some("scheduled");
         let mut app = App::base(cfg, false, state, scheduled);
-        app.status = Status::read();
-        app.unit_active = unit_is_active(&app.cfg.unit);
-        let attach = app.unit_active
-            || matches!(
-                app.status.as_ref().map(|s| s.phase),
-                Some(Phase::Done | Phase::Cleaning | Phase::Installing)
-            );
-        if attach {
+        app.unit = UnitWatch::spawn(&app.cfg.unit);
+        // A stale status file outlives a dead worker until reboot; only a running
+        // unit is worth attaching to. The probe spots a staged generation itself.
+        if unit_is_active(&app.cfg.unit) {
+            app.unit.set(true);
+            app.status = Status::read();
             app.enter_progress();
         } else {
-            app.status = None;
             app.spawn_probe();
         }
         app
@@ -453,11 +533,40 @@ impl App {
 
     /// Done, but the worker's reboot never came.
     fn stalled(&self) -> bool {
+        self.stalled_at(Instant::now())
+    }
+
+    /// Only the clock decides: the worker exits as it reboots, so an inactive
+    /// unit after Done is the reboot itself, not a stall.
+    fn stalled_at(&self, now: Instant) -> bool {
         match (self.screen == Screen::Progress, self.done_since) {
-            (true, Some(since)) => {
-                !self.mock && (!self.unit_active || since.elapsed() >= REBOOT_WAIT)
-            }
+            (true, Some(since)) => !self.mock && now.duration_since(since) >= REBOOT_WAIT,
             _ => false,
+        }
+    }
+
+    fn on_screen(&self) -> bool {
+        self.focused && self.shown
+    }
+
+    fn heartbeat_due(&self, now: Instant) -> bool {
+        !self.mock && self.on_screen() && now.duration_since(self.polls.heartbeat) >= HEARTBEAT
+    }
+
+    /// Focus and visibility gate the heartbeat, so the worker reboots only while
+    /// the UI is the thing on screen.
+    fn window_event(&mut self, event: &WindowEvent) {
+        let was_on_screen = self.on_screen();
+        match event {
+            WindowEvent::FocusGained => self.focused = true,
+            WindowEvent::FocusLost => self.focused = false,
+            WindowEvent::Shown | WindowEvent::Restored => self.shown = true,
+            WindowEvent::Hidden | WindowEvent::Minimized => self.shown = false,
+            _ => return,
+        }
+        if self.on_screen() && !was_on_screen {
+            self.polls.heartbeat = Instant::now() - HEARTBEAT;
+            self.dirty = true;
         }
     }
 
@@ -527,7 +636,7 @@ impl App {
     }
 
     fn tick(&mut self, now: Instant) {
-        if !self.mock && now.duration_since(self.polls.heartbeat) >= HEARTBEAT {
+        if self.heartbeat_due(now) {
             self.polls.heartbeat = now;
             if let Err(err) = status::touch_heartbeat() {
                 eprintln!("steam-maintenance: heartbeat: {err:#}");
@@ -580,14 +689,8 @@ impl App {
                 self.dirty = true;
             }
         }
-        if now.duration_since(self.polls.unit) >= UNIT_POLL {
-            self.polls.unit = now;
-            let active = unit_is_active(&self.cfg.unit);
-            if active != self.unit_active {
-                self.unit_active = active;
-                self.dirty = true;
-            }
-        }
+        self.guard_cancel_modal();
+        self.settle_round();
         match self.status.as_ref().map(|s| s.phase) {
             Some(Phase::Done) => {}
             Some(Phase::UpToDate) => self.set_screen(Screen::up_to_date(None)),
@@ -602,7 +705,7 @@ impl App {
                 ));
             }
             _ => {
-                let stopped = self.status.is_none() || !self.unit_active;
+                let stopped = self.status.is_none() || self.unit.stopped();
                 let grace = self
                     .progress_since
                     .map(|t| now.duration_since(t) < START_GRACE)
@@ -623,8 +726,28 @@ impl App {
         }
     }
 
+    /// Close the cancel prompt once the worker has moved past the point of no return.
+    fn guard_cancel_modal(&mut self) {
+        let asking = matches!(&self.modal, Some(m) if m.kind == ModalKind::ConfirmCancel);
+        if asking && !cancellable_now(self.status.as_ref()) {
+            self.set_modal(None);
+        }
+    }
+
+    /// Done or UpToDate from the worker ends the round: the deferral count starts
+    /// again. `next_due` is left alone; the check rolls it once local == remote.
+    fn settle_round(&mut self) {
+        if self.mock || self.settled || !round_settled(self.status.as_ref().map(|s| s.phase)) {
+            return;
+        }
+        self.settled = true;
+        self.state.reset_deferrals();
+        self.save_state();
+    }
+
     /// Turn the probe result into the first real screen.
     fn decide(&mut self, info: UpdateInfo, subjects: Vec<String>) {
+        self.remote_rev = info.remote_rev.clone();
         let installed = short_rev(info.local_rev.as_deref());
         let policy = later_policy(self.state.deferrals, self.cfg.max_deferrals, self.scheduled);
         if info.update_available() {
@@ -793,19 +916,24 @@ impl App {
             self.enter_progress();
             return;
         }
-        self.state.reset_deferrals();
-        self.roll_due_and_save();
-        self.start_requested_at = now();
-        if let Err(err) = util::run("systemctl", &["start", &self.cfg.unit]) {
-            self.set_screen(Screen::error(
-                "Couldn't start the update",
-                &format!("{err:#}"),
+        // Schedule state changes only once the worker reports a result; a start
+        // that fails must not silence the next prompt.
+        let started = self
+            .remote_rev
+            .as_deref()
+            .map_or(Ok(()), status::write_request)
+            .and_then(|_| util::run("systemctl", &["start", &self.cfg.unit]).map(|_| ()));
+        if let Err(err) = started {
+            self.set_screen(Screen::failed(
+                &format!("Couldn't start the update: {err:#}"),
+                &[],
             ));
             return;
         }
+        self.start_requested_at = now();
         self.status = None;
-        self.unit_active = true;
-        self.polls.unit = Instant::now();
+        self.settled = false;
+        self.unit.set(true);
         self.enter_progress();
     }
 
@@ -821,6 +949,18 @@ impl App {
     }
 
     fn cancel_update(&mut self) {
+        if !self.mock {
+            // The prompt may have sat open while the worker moved on to the install.
+            let fresh = Status::read().filter(|s| s.started_at >= self.start_requested_at);
+            if !same_status(&fresh, &self.status) {
+                self.status = fresh;
+                self.dirty = true;
+            }
+        }
+        if !cancellable_now(self.status.as_ref()) {
+            self.set_modal(None);
+            return;
+        }
         self.cancel_requested = true;
         if !self.mock {
             let unit = self.cfg.unit.clone();
@@ -833,5 +973,129 @@ impl App {
             self.save_state();
         }
         self.set_screen(Screen::cancelled());
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn app() -> App {
+        App::base(Config::from_env(), false, State::default(), false)
+    }
+
+    fn status(phase: Phase, cancellable: bool) -> Status {
+        let mut s = Status::new(phase);
+        s.cancellable = cancellable;
+        s
+    }
+
+    #[test]
+    fn cancel_is_refused_past_the_point_of_no_return() {
+        assert!(cancellable_now(None));
+        assert!(cancellable_now(Some(&status(Phase::Downloading, true))));
+        assert!(!cancellable_now(Some(&status(Phase::Downloading, false))));
+        for phase in [
+            Phase::Installing,
+            Phase::Cleaning,
+            Phase::Done,
+            Phase::UpToDate,
+            Phase::Failed,
+        ] {
+            assert!(!cancellable_now(Some(&status(phase, true))), "{phase:?}");
+        }
+    }
+
+    #[test]
+    fn open_cancel_prompt_closes_when_the_worker_starts_installing() {
+        let mut app = app();
+        app.status = Some(status(Phase::Downloading, true));
+        app.enter_progress();
+        app.set_modal(Some(Modal::confirm_cancel()));
+        app.guard_cancel_modal();
+        assert!(app.modal.is_some());
+        app.status = Some(status(Phase::Installing, false));
+        app.guard_cancel_modal();
+        assert!(app.modal.is_none());
+        assert_eq!(app.screen, Screen::Progress);
+    }
+
+    #[test]
+    fn stalled_waits_for_the_timer_and_ignores_the_unit_going_away() {
+        let mut app = app();
+        app.unit = UnitWatch::fixed(false);
+        app.status = Some(status(Phase::Done, false));
+        app.enter_progress();
+        let t0 = Instant::now();
+        assert!(!app.stalled_at(t0));
+        app.done_since = Some(t0);
+        assert!(!app.stalled_at(t0 + Duration::from_secs(10)));
+        assert!(!app.stalled_at(t0 + REBOOT_WAIT - Duration::from_secs(1)));
+        assert!(app.stalled_at(t0 + REBOOT_WAIT));
+    }
+
+    #[test]
+    fn a_round_settles_on_done_or_up_to_date_only() {
+        assert!(round_settled(Some(Phase::Done)));
+        assert!(round_settled(Some(Phase::UpToDate)));
+        assert!(!round_settled(None));
+        for phase in [
+            Phase::Evaluating,
+            Phase::Downloading,
+            Phase::Building,
+            Phase::Installing,
+            Phase::Cleaning,
+            Phase::Failed,
+        ] {
+            assert!(!round_settled(Some(phase)), "{phase:?}");
+        }
+    }
+
+    #[test]
+    fn heartbeat_only_while_focused_and_shown() {
+        let mut app = app();
+        // A regain re-arms the heartbeat relative to the real clock, so each
+        // check after one reads the clock afresh.
+        assert!(app.heartbeat_due(Instant::now()));
+        app.window_event(&WindowEvent::FocusLost);
+        assert!(!app.heartbeat_due(Instant::now()));
+        app.window_event(&WindowEvent::FocusGained);
+        assert!(app.heartbeat_due(Instant::now()));
+        app.window_event(&WindowEvent::Minimized);
+        assert!(!app.heartbeat_due(Instant::now()));
+        app.window_event(&WindowEvent::Restored);
+        assert!(app.heartbeat_due(Instant::now()));
+        app.window_event(&WindowEvent::Hidden);
+        app.window_event(&WindowEvent::FocusLost);
+        app.window_event(&WindowEvent::FocusGained);
+        assert!(!app.heartbeat_due(Instant::now()));
+        app.window_event(&WindowEvent::Shown);
+        assert!(app.heartbeat_due(Instant::now()));
+        let now = Instant::now();
+        app.polls.heartbeat = now;
+        assert!(!app.heartbeat_due(now + Duration::from_secs(1)));
+        assert!(app.heartbeat_due(now + HEARTBEAT));
+    }
+
+    #[test]
+    fn focus_gain_makes_the_heartbeat_due_at_once() {
+        let mut app = app();
+        app.window_event(&WindowEvent::FocusLost);
+        app.polls.heartbeat = Instant::now();
+        app.window_event(&WindowEvent::FocusGained);
+        assert!(app.heartbeat_due(Instant::now()));
+    }
+
+    #[test]
+    fn unit_watch_is_unknown_until_set() {
+        let watch = UnitWatch {
+            active: Arc::new(AtomicBool::new(false)),
+            known: Arc::new(AtomicBool::new(false)),
+        };
+        assert!(!watch.stopped());
+        watch.set(false);
+        assert!(watch.stopped());
+        watch.set(true);
+        assert!(watch.active() && !watch.stopped());
     }
 }
