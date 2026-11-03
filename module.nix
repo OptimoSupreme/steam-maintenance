@@ -53,7 +53,13 @@ let
       ${lib.concatStringsSep "\n" (
         lib.mapAttrsToList (name: value: "export ${name}=${lib.escapeShellArg value}") envVars
       )}
-      exec env -u LD_LIBRARY_PATH SDL_VIDEODRIVER=x11 ${lib.getExe cfg.package} "''${@:-ui}"
+      # Steam keeps no stderr for the shortcut it launches, so the UI logs to a file
+      if [ "''${1:-ui}" = ui ]; then
+        log="''${XDG_STATE_HOME:-$HOME/.local/state}/steam-maintenance/ui.log"
+        mkdir -p "$(dirname "$log")"
+        exec env -u LD_LIBRARY_PATH SDL_VIDEODRIVER=x11 ${lib.getExe cfg.package} "''${@:-ui}" 2>"$log"
+      fi
+      exec env -u LD_LIBRARY_PATH SDL_VIDEODRIVER=x11 ${lib.getExe cfg.package} "$@"
     '';
   };
 in
