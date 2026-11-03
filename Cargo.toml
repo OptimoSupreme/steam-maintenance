@@ -1,6 +1,6 @@
 [package]
 name = "steam-maintenance"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 description = "User-driven NixOS upgrades for Steam machines running Jovian gaming mode"
 license = "MIT"
@@ -9,12 +9,8 @@ repository = "https://github.com/OptimoSupreme/steam-maintenance"
 [dependencies]
 anyhow = "1.0"
 chrono = { version = "0.4", default-features = false, features = ["clock", "std"] }
-crc32fast = "1.5"
-fontdue = "0.9"
-sdl2 = { version = "0.38", features = ["use-pkgconfig"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-ttf-parser = { version = "0.25", default-features = false }
 x11rb = "0.14"
 
 [profile.release]

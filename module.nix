@@ -20,12 +20,7 @@ let
     STEAM_MAINTENANCE_CHECK_DUE = cfg.checkDue;
     STEAM_MAINTENANCE_MAX_DEFERRALS = toString cfg.maxDeferrals;
     STEAM_MAINTENANCE_BATTERY_GATE = toString cfg.batteryGate;
-    STEAM_MAINTENANCE_PROTOCOL_HANDLER = toString cfg.protocolHandler;
     STEAM_MAINTENANCE_UNIT = unit;
-    STEAM_MAINTENANCE_GRID_DIR = "${cfg.package}/share/steam-maintenance/grid";
-    STEAM_MAINTENANCE_TOAST = if cfg.toast then "1" else "0";
-    STEAM_MAINTENANCE_EXE = "/run/current-system/sw/bin/steam-maintenance";
-    STEAM_MAINTENANCE_APP_NAME = "System Update";
   };
 
   ## nixpkgs exports nixos-version only through environment.systemPackages
@@ -38,14 +33,12 @@ let
     config.systemd.package
     pkgs.git
     pkgs.curl
-    pkgs.libnotify
     config.system.build.nixos-rebuild
     config.nix.package
     pkgs.coreutils
     nixos-version
   ];
 
-  ## No arguments means ui, so the Steam shortcut needs no launch options
   wrapper = pkgs.writeShellApplication {
     name = "steam-maintenance";
     runtimeInputs = tools;
@@ -53,15 +46,17 @@ let
       ${lib.concatStringsSep "\n" (
         lib.mapAttrsToList (name: value: "export ${name}=${lib.escapeShellArg value}") envVars
       )}
-      # Steam keeps no stderr for the shortcut it launches, so the UI logs to a file
-      if [ "''${1:-ui}" = ui ]; then
-        log="''${XDG_STATE_HOME:-$HOME/.local/state}/steam-maintenance/ui.log"
-        mkdir -p "$(dirname "$log")"
-        exec env -u LD_LIBRARY_PATH SDL_VIDEODRIVER=x11 ${lib.getExe cfg.package} "''${@:-ui}" 2>"$log"
-      fi
-      exec env -u LD_LIBRARY_PATH SDL_VIDEODRIVER=x11 ${lib.getExe cfg.package} "$@"
+      exec ${lib.getExe cfg.package} "$@"
     '';
   };
+
+  ## The Decky plugin, calling the wrapper so it sees the same configuration
+  plugin = pkgs.callPackage ./plugin/package.nix {
+    steam-maintenance = wrapper;
+    inherit (cfg.package) version;
+  };
+
+  pluginDir = "${config.jovian.decky-loader.stateDir}/plugins/steam-maintenance";
 in
 {
   ## Options
@@ -73,13 +68,6 @@ in
       default = pkgs.callPackage ./package.nix { };
       defaultText = lib.literalExpression "pkgs.callPackage ./package.nix { }";
       description = "The steam-maintenance package.";
-    };
-
-    user = lib.mkOption {
-      type = lib.types.str;
-      default = config.jovian.steam.user;
-      defaultText = lib.literalExpression "config.jovian.steam.user";
-      description = "The Steam user, allowed to start and stop the upgrade unit.";
     };
 
     flake = lib.mkOption {
@@ -121,26 +109,13 @@ in
     maxDeferrals = lib.mkOption {
       type = lib.types.ints.unsigned;
       default = 2;
-      description = "Deferrals allowed before a scheduled update becomes mandatory.";
+      description = "Deferrals allowed before a scheduled update installs on its own.";
     };
 
     batteryGate = lib.mkOption {
       type = lib.types.ints.between 0 100;
       default = 30;
       description = "Below this battery percentage, Update is disabled unless charging. 0 disables the gate.";
-    };
-
-    toast = lib.mkOption {
-      type = lib.types.bool;
-      default = true;
-      description = "Send a desktop notification shortly before opening the UI.";
-    };
-
-    protocolHandler = lib.mkOption {
-      type = lib.types.either lib.types.path lib.types.str;
-      default = (pkgs.jovianPackages or { }).jovian-steam-protocol-handler or "steam";
-      defaultText = lib.literalExpression ''pkgs.jovianPackages.jovian-steam-protocol-handler or "steam"'';
-      description = "Program that hands a steam:// URL to the running Steam client.";
     };
   };
 
@@ -149,18 +124,20 @@ in
     assertions = [
       {
         assertion = config.jovian.steam.enable;
-        message = "services.steam-maintenance needs jovian.steam.enable: the UI runs inside the Jovian gamescope session.";
+        message = "services.steam-maintenance needs jovian.steam.enable: the check runs inside the Jovian gamescope session.";
+      }
+      {
+        assertion = config.jovian.decky-loader.enable;
+        message = "services.steam-maintenance needs jovian.decky-loader.enable: the update panel is a Decky plugin.";
       }
     ];
 
     environment.systemPackages = [ wrapper ];
 
-    ## Register the shortcut before gamescope and Steam start
-    environment.etc."jovian/gamescope-session/pre-start".text = ''
-      ${wrapper}/bin/steam-maintenance register || true
-    '';
+    ## The plugin, linked from the store so Decky's own updater leaves it alone
+    systemd.tmpfiles.rules = [ "L+ ${pluginDir} - - - - ${plugin}" ];
 
-    ## The upgrade itself, as root, started and stopped by the UI
+    ## The upgrade itself, as root, started and stopped by the plugin backend
     systemd.services.steam-maintenance-upgrade = {
       description = "System Update";
       restartIfChanged = false;
@@ -207,26 +184,13 @@ in
         ExecStart = "${wrapper}/bin/steam-maintenance check";
       };
     };
-
-    ## Let the Steam user start and stop the upgrade
-    security.polkit.enable = true;
-    security.polkit.extraConfig = ''
-      polkit.addRule(function(action, subject) {
-        if (action.id == "org.freedesktop.systemd1.manage-units" &&
-            action.lookup("unit") == "${unit}" &&
-            (action.lookup("verb") == "start" || action.lookup("verb") == "stop") &&
-            subject.local && subject.active &&
-            subject.user == "${cfg.user}") {
-          return polkit.Result.YES;
-        }
-      });
-    '';
   };
 }
 
-# Steam must launch the UI: gamescope only shows windows of processes Steam
-# started, so the UI is a non-Steam shortcut (kept current by `register`) that
-# the check opens through the steam:// protocol handler. The worker stages the
-# new generation with `nixos-rebuild boot` and reboots only while the UI's
-# heartbeat is fresh, so a machine never restarts behind a game or a blank
-# screen; if the UI is gone, the generation simply waits for the next boot.
+# The check runs in the gaming session, where it can see what gamescope shows,
+# and only ever hands a prompt to the plugin while Steam sits idle on its home
+# screen. The plugin backend runs as root under Decky and starts, stops and
+# follows the worker; the worker stages the new generation with `nixos-rebuild
+# boot` and reboots only while the plugin's heartbeat is fresh, which the plugin
+# sends while its update view is on screen and no game is running. Otherwise
+# the generation simply waits for the next boot.

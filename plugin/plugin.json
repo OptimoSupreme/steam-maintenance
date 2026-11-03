@@ -1,0 +1,11 @@
+{
+  "name": "System Update",
+  "author": "Justin Ward",
+  "flags": ["root"],
+  "api_version": 1,
+  "publish": {
+    "tags": ["nixos", "updater"],
+    "description": "NixOS updates for a Jovian Steam machine, from the Quick Access Menu.",
+    "image": ""
+  }
+}
