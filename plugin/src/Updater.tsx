@@ -10,7 +10,6 @@ import {
   later,
   probe,
   reboot,
-  shortRev,
   snooze,
   start,
   stop,
@@ -27,7 +26,6 @@ const { useEffect, useState, Fragment } = React;
 const OFFER_MAX_AGE_MS = 5 * 60 * 1000;
 const HEARTBEAT_MS = 2000;
 const SNAPSHOT_MS = 10000;
-const SUBJECT_LINES = 6;
 const LOG_LINES = 6;
 
 export interface UpdaterProps {
@@ -89,7 +87,7 @@ export async function runProbe() {
     store.set({ offer: await probe(), offerAt: Date.now() });
   } catch (err) {
     console.error('[System Update] probe:', err);
-    store.set({ offer: { kind: 'offline', installed: null, available: null, subjects: [] }, offerAt: Date.now() });
+    store.set({ offer: { kind: 'offline', installed: null, available: null }, offerAt: Date.now() });
   } finally {
     store.set({ probing: false });
   }
@@ -206,6 +204,10 @@ export function Updater(props: UpdaterProps) {
     heartbeatRefused: s.heartbeatRefused,
     cancelled: live !== null && live.started_at === s.cancelled,
     showLater: props.showLater ?? false,
+    // A prompt's modal shows the offer it was handed, so a new probe wouldn't reach it.
+    showRefresh: props.mode === 'panel',
+    // Kept current by the snapshot poll's re-renders.
+    checked: checkedText(Date.now() - s.offerAt),
     onUpdate,
     onRestart,
     onCancel,
@@ -229,6 +231,8 @@ interface Facts {
   heartbeatRefused: string | null;
   cancelled: boolean;
   showLater: boolean;
+  showRefresh: boolean;
+  checked: string;
   onUpdate: () => void;
   onRestart: () => void;
   onCancel: () => void;
@@ -288,20 +292,20 @@ export function describe(f: Facts): Section {
   }
 
   const o = f.offer;
-  const check: ButtonSpec = { id: 'check', label: 'Check again', onClick: f.onCheck };
+  const refresh: ButtonSpec = { id: 'refresh', label: 'Refresh', onClick: f.onCheck };
   switch (o.kind) {
     case 'update': {
-      const lines: React.ReactNode[] = [
-        <Line key="revs" text={`${shortRev(o.installed)} → ${shortRev(o.available)}`} muted />,
-        ...o.subjects.slice(0, SUBJECT_LINES).map((subject, i) => <Line key={`s${i}`} text={subject} />),
-      ];
-      if (f.batteryBlocked) {
-        lines.push(<Line key="battery" text={`Plug in or charge above ${f.batteryGate}% to update.`} />);
-      }
+      const line = f.batteryBlocked
+        ? <Line key="l" text={`Plug in or charge above ${f.batteryGate}% to update.`} />
+        : <Line key="l" text={f.checked} muted />;
       return {
         title: 'Update available',
-        lines,
-        buttons: [{ id: 'update', label: 'Update', onClick: f.onUpdate, disabled: f.batteryBlocked }, ...laterButton],
+        lines: [line],
+        buttons: [
+          ...(f.showRefresh ? [refresh] : []),
+          { id: 'update', label: 'Update', onClick: f.onUpdate, disabled: f.batteryBlocked },
+          ...laterButton,
+        ],
       };
     }
     case 'restart':
@@ -313,23 +317,31 @@ export function describe(f: Facts): Section {
     case 'preparing':
       return {
         title: 'Update on its way',
-        lines: [<Line key="l" text={`${shortRev(o.available)} is still being built for this machine.`} />],
-        buttons: [check],
+        lines: [<Line key="l" text="A new version is still being built for this machine." />],
+        buttons: [refresh],
       };
     case 'offline':
       return {
         title: 'Offline',
         lines: [<Line key="l" text="Couldn't reach GitHub to look for updates." />],
-        buttons: [check],
+        buttons: [refresh],
       };
     case 'current':
     default:
       return {
         title: 'Up to date',
-        lines: [<Line key="l" text={`Installed ${shortRev(o.installed)}`} muted />],
-        buttons: [check],
+        lines: [<Line key="l" text={f.checked} muted />],
+        buttons: [refresh],
       };
   }
+}
+
+function checkedText(ageMs: number): string {
+  const minutes = Math.floor(ageMs / 60000);
+  if (minutes < 1) return 'Checked just now';
+  if (minutes < 60) return `Checked ${minutes} minute${minutes === 1 ? '' : 's'} ago`;
+  const hours = Math.floor(minutes / 60);
+  return `Checked ${hours} hour${hours === 1 ? '' : 's'} ago`;
 }
 
 function counts(s: Status): string {

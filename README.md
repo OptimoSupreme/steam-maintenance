@@ -7,7 +7,7 @@ User-driven NixOS upgrades for Steam machines running Jovian gaming mode.
 - Adds a **System Update** panel to the Quick Access Menu through a Decky
   plugin. Opening it shows whether the fleet repo has a newer commit than the
   running system and whether the binary cache already holds that build, then
-  offers Update, Restart or Check again. It can be opened mid-game; an update
+  offers Update, Restart or Refresh. It can be opened mid-game; an update
   started from it runs in the background.
 - Once a week (`checkDue`, default Sunday noon) a user timer checks for an
   update while Steam sits idle on its home screen and, if there is one, shows
