@@ -26,7 +26,6 @@ const FOCUSED_APP_PROPERTY: &[u8] = b"GAMESCOPE_FOCUSED_APP_GFX";
 const MIN_STEAM_UPTIME_SECS: u64 = 120;
 /// After a prompt the check stays quiet for an hour.
 const SNOOZE_SECS: u64 = 3600;
-const MAX_SUBJECTS: usize = 20;
 /// Upper bound on any network call, so a black-holed link cannot stall the check.
 const NETWORK_TIMEOUT_SECS: &str = "30";
 const CONNECT_TIMEOUT_SECS: &str = "10";
@@ -108,22 +107,15 @@ pub struct Offer {
     pub kind: OfferKind,
     pub installed: Option<String>,
     pub available: Option<String>,
-    /// Commit subjects between the two revisions, newest first; only for `Update`.
-    pub subjects: Vec<String>,
 }
 
 /// Probe the repo and the cache and describe the result. Network calls, may take seconds.
 pub fn offer(cfg: &Config) -> (UpdateInfo, Offer) {
     let info = probe_update(cfg);
-    let subjects = match (info.update_available(), &info.local_rev, &info.remote_rev) {
-        (true, Some(local), Some(remote)) => commit_subjects(cfg, local, remote),
-        _ => Vec::new(),
-    };
     let offer = Offer {
         kind: info.kind(),
         installed: info.local_rev.clone(),
         available: info.remote_rev.clone(),
-        subjects,
     };
     (info, offer)
 }
@@ -143,15 +135,6 @@ pub fn probe_update(cfg: &Config) -> UpdateInfo {
         cache_ready,
         restart_pending: restart_pending(),
     }
-}
-
-/// Commit subjects between two revisions from the public GitHub compare API,
-/// newest first; empty when offline or on any error.
-pub fn commit_subjects(cfg: &Config, from: &str, to: &str) -> Vec<String> {
-    let path = format!("repos/{}/compare/{from}...{to}", cfg.repo);
-    github_get(&path)
-        .map(|body| subjects_from_compare(&body))
-        .unwrap_or_default()
 }
 
 /// What the check decided the plugin should show. Written by `check` in the
@@ -452,25 +435,6 @@ fn runs_succeeded(json: &str) -> bool {
         .unwrap_or(false)
 }
 
-/// First lines of `commits[].commit.message` from a compare response, newest first,
-/// at most `MAX_SUBJECTS`.
-fn subjects_from_compare(json: &str) -> Vec<String> {
-    let Ok(value) = serde_json::from_str::<Value>(json) else {
-        return Vec::new();
-    };
-    let Some(commits) = value.get("commits").and_then(Value::as_array) else {
-        return Vec::new();
-    };
-    commits
-        .iter()
-        .rev()
-        .filter_map(|c| c.get("commit")?.get("message")?.as_str())
-        .map(|m| m.lines().next().unwrap_or("").trim().to_string())
-        .filter(|s| !s.is_empty())
-        .take(MAX_SUBJECTS)
-        .collect()
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -504,39 +468,6 @@ mod tests {
         assert!(!runs_succeeded(r#"{"total_count":0,"workflow_runs":[]}"#));
         assert!(!runs_succeeded(r#"{"message":"Not Found"}"#));
         assert!(!runs_succeeded("<html>"));
-    }
-
-    #[test]
-    fn compare_subjects_are_newest_first_and_first_line_only() {
-        let json = r#"{
-          "status": "ahead",
-          "commits": [
-            {"sha": "a", "commit": {"message": "feat(smeagol): add the host\n\nlonger body"}},
-            {"sha": "b", "commit": {"message": "chore(flake): weekly lock update"}},
-            {"sha": "c", "commit": {"message": "  fix(ui): pad the title  "}}
-          ]
-        }"#;
-        assert_eq!(
-            subjects_from_compare(json),
-            vec![
-                "fix(ui): pad the title",
-                "chore(flake): weekly lock update",
-                "feat(smeagol): add the host"
-            ]
-        );
-    }
-
-    #[test]
-    fn compare_subjects_are_capped_and_tolerant() {
-        let commits: Vec<String> = (0..30)
-            .map(|i| format!(r#"{{"commit":{{"message":"commit {i}"}}}}"#))
-            .collect();
-        let json = format!(r#"{{"commits":[{}]}}"#, commits.join(","));
-        let subjects = subjects_from_compare(&json);
-        assert_eq!(subjects.len(), MAX_SUBJECTS);
-        assert_eq!(subjects[0], "commit 29");
-        assert!(subjects_from_compare(r#"{"message":"Not Found"}"#).is_empty());
-        assert!(subjects_from_compare("").is_empty());
     }
 
     #[test]
@@ -604,7 +535,6 @@ mod tests {
             kind,
             installed: Some("a".into()),
             available: Some("b".into()),
-            subjects: Vec::new(),
         }
     }
 

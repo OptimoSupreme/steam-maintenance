@@ -55,7 +55,6 @@ export interface Offer {
   kind: OfferKind;
   installed: string | null;
   available: string | null;
-  subjects: string[];
 }
 
 export interface Prompt {
@@ -95,9 +94,6 @@ export const heartbeat = callable<[], HeartbeatReply>('heartbeat');
 export const start = callable<[rev: string | null], {}>('start');
 export const stop = callable<[], {}>('stop');
 export const reboot = callable<[], {}>('reboot');
-
-export const shortRev = (rev: string | null | undefined): string =>
-  rev ? rev.slice(0, 7) : 'unknown';
 
 export const errorText = (err: unknown): string =>
   err instanceof Error ? err.message : String(err);
