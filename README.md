@@ -113,4 +113,5 @@ check` builds the binary, the plugin (type check included) and evaluates the
 module against `tests/eval-host.nix`. `nix build .#plugin` produces the
 directory Decky loads; to try it on a device without a deploy, copy it over
 `/var/lib/decky-loader/plugins/steam-maintenance` and restart
-`decky-loader.service`.
+`decky-loader.service`. A deploy leaves that copy in place; delete it and
+restart the service to go back to the deployed plugin.

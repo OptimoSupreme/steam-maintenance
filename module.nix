@@ -135,7 +135,14 @@ in
     environment.systemPackages = [ wrapper ];
 
     ## The plugin, linked from the store so Decky's own updater leaves it alone
-    systemd.tmpfiles.rules = [ "L+ ${pluginDir} - - - - ${plugin}" ];
+    # Not tmpfiles: it refuses plugins/, root-owned under the Decky user's stateDir
+    systemd.services.decky-loader.preStart = lib.mkAfter ''
+      mkdir -p "${dirOf pluginDir}"
+      # A real directory is a development copy
+      if [ -L "${pluginDir}" ] || [ ! -e "${pluginDir}" ]; then
+        ln -sfn "${plugin}" "${pluginDir}"
+      fi
+    '';
 
     ## The upgrade itself, as root, started and stopped by the plugin backend
     systemd.services.steam-maintenance-upgrade = {
